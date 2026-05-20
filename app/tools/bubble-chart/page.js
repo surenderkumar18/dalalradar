@@ -125,10 +125,9 @@ function BubbleChartContent() {
         params.delete("sector");
       }
       const queryString = params.toString();
-      router.replace(
-        queryString ? `${pathname}?${queryString}` : pathname,
-        { scroll: false },
-      );
+      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+        scroll: false,
+      });
     },
     [pathname, router],
   );
@@ -164,8 +163,9 @@ function BubbleChartContent() {
   });
 
   const [enableSignalEngine, setEnableSignalEngine] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("enable_signal_engine") === "true";
+    if (typeof window === "undefined") return true;
+    const saved = localStorage.getItem("enable_signal_engine");
+    return saved === null ? true : saved === "true";
   });
 
   useEffect(() => {
@@ -563,10 +563,9 @@ function BubbleChartContent() {
       const params = new URLSearchParams(window.location.search);
       params.delete("sector");
       const queryString = params.toString();
-      router.replace(
-        queryString ? `${pathname}?${queryString}` : pathname,
-        { scroll: false },
-      );
+      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+        scroll: false,
+      });
     }
   }, [sectors, selectedSector, pathname, router]);
 

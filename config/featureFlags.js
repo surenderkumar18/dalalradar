@@ -60,6 +60,7 @@ export const FEATURE_FLAGS = {
   // ─── Future Tools ───
   ROLLOVER_TOOL: false, // not built yet
   HEATMAP_TOOL: false, // not built yet
+  OI_PRICE_CHART: true,
 };
 
 // ─────────────────────────────────────────────────────────────────
@@ -98,4 +99,5 @@ export const PREMIUM_FEATURES = {
   AI_INSIGHTS: true,
   API_ACCESS: true,
   REAL_TIME_DATA: true,
+  OI_PRICE_CHART: true,
 };

@@ -7,6 +7,8 @@ import {
   formatMoney,
 } from "@/app/tools/bubble-chart/utils/bubbleEngineSub";
 
+import PremiumFeature from "@/components/PremiumFeature";
+
 import MiniRolloverBars from "./MiniRolloverBars";
 import OIPriceChart from "@/app/components/OIPriceChart";
 
@@ -106,7 +108,8 @@ function SignalEnginePanel({ d }) {
   const cfg = SIGNAL_TYPE_CONFIG[sig.type] || SIGNAL_TYPE_CONFIG.WARN;
   const validation = VALIDATION_CONFIG[d.signalValidation || "tentative"];
   const trend = TREND_CONFIG[sig.trendContext] || TREND_CONFIG.unknown;
-  const bigTrend = BIG_TREND_CONFIG[sig.bigTrendContext] || BIG_TREND_CONFIG.unknown;
+  const bigTrend =
+    BIG_TREND_CONFIG[sig.bigTrendContext] || BIG_TREND_CONFIG.unknown;
   const patternDesc = PATTERN_DESCRIPTIONS[sig.pattern] || "";
 
   const strengthPct = Math.round((sig.strength || 0) * 100);
@@ -155,7 +158,14 @@ function SignalEnginePanel({ d }) {
               {formatPatternName(sig.pattern)}
             </div>
             {patternDesc && (
-              <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 1, fontStyle: "italic" }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: "#94a3b8",
+                  marginTop: 1,
+                  fontStyle: "italic",
+                }}
+              >
                 {patternDesc}
               </div>
             )}
@@ -299,9 +309,7 @@ function SignalEnginePanel({ d }) {
         {sig.priorDamaged && (
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span style={{ color: "#94a3b8" }}>Prior damage</span>
-            <b style={{ color: "#a78bfa" }}>
-              ⚠️ Yes (recovered)
-            </b>
+            <b style={{ color: "#a78bfa" }}>⚠️ Yes (recovered)</b>
           </div>
         )}
       </div>
@@ -531,7 +539,8 @@ function getRelativeStrengthLabel(relativePrice) {
   if (relativePrice >= 1.0) return { text: "Strong leader", color: "#a78bfa" };
   if (relativePrice >= 0.3) return { text: "Outperforming", color: "#22c55e" };
   if (relativePrice >= -0.3) return { text: "In-line", color: "#94a3b8" };
-  if (relativePrice >= -1.0) return { text: "Underperforming", color: "#fca5a5" };
+  if (relativePrice >= -1.0)
+    return { text: "Underperforming", color: "#fca5a5" };
   return { text: "Strong laggard", color: "#ef4444" };
 }
 
@@ -1053,17 +1062,18 @@ const CustomTooltip = React.memo(function CustomTooltip({
             currentDate={d.x}
             latestDate={latestDate}
           />
-
-          <div style={{ marginTop: 12 }}>
-            <MemoOIPriceChart
-              key={d.stock + "-" + d.x}
-              symbol={d.stock}
-              currentDate={d.x}
-              onClose={() => {}}
-              canvasHeight={180}
-              days={30}
-            />
-          </div>
+          <PremiumFeature feature="OI_PRICE_CHART">
+            <div style={{ marginTop: 12 }}>
+              <MemoOIPriceChart
+                key={d.stock + "-" + d.x}
+                symbol={d.stock}
+                currentDate={d.x}
+                onClose={() => {}}
+                canvasHeight={180}
+                days={30}
+              />
+            </div>
+          </PremiumFeature>
         </>
       )}
     </div>
