@@ -1,0 +1,63 @@
+{
+  "SWIGGY": {
+    "buildup": "Short Covering",
+    "grade": "A+++"
+  },
+  "PREMIERENE": {
+    "buildup": null
+  },
+  "BAJAJHLDNG": {
+    "buildup": null
+  },
+  "WAAREEENER": {
+    "buildup": "Short Covering"
+  },
+  "FINNIFTY": {
+    "buildup": "Long Unwinding"
+  },
+  "SYNGENE": {
+    "buildup": "Short Buildup"
+  },
+  "VEDL": {
+    "buildup": null
+  },
+  "JINDALSTEL": {
+    "buildup": null
+  },
+  "LUPIN": {
+    "grade": "A+++"
+  },
+  "ICICIBANK": {
+    "buildup": null
+  },
+  "POWERGRID": {
+    "grade": null
+  },
+  "ONGC": {
+    "buildup": null
+  },
+  "JSWSTEEL": {
+    "buildup": null
+  },
+  "NATIONALUM": {
+    "grade": "A+++"
+  },
+  "BAJAJ-AUTO": {
+    "buildup": null
+  },
+  "LTM": {
+    "grade": "A+"
+  },
+  "TORNTPHARM": {
+    "grade": "B"
+  },
+  "DIVISLAB": {
+    "grade": "A+++"
+  },
+  "HAVELLS": {
+    "grade": "A+"
+  },
+  "COALINDIA": {
+    "grade": null
+  }
+}

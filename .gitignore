@@ -1,0 +1,73 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# ─── DEPENDENCIES ──────────────────────────────────────
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ─── TESTING ───────────────────────────────────────────
+/coverage
+
+# ─── NEXT.JS ───────────────────────────────────────────
+/.next/
+/out/
+
+# ─── PRODUCTION ────────────────────────────────────────
+/build
+
+# ─── MISC ──────────────────────────────────────────────
+.DS_Store
+*.pem
+
+# ─── DEBUG LOGS ────────────────────────────────────────
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ─── ENV FILES (NEVER COMMIT) ──────────────────────────
+.env*
+
+# ─── VERCEL ────────────────────────────────────────────
+.vercel
+
+# ─── TYPESCRIPT ────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ─── PUBLIC IMAGES ─────────────────────────────────────
+# Block all images in public/
+/public/**/*.png
+/public/**/*.jpg
+/public/**/*.jpeg
+/public/**/*.webp
+/public/**/*.gif
+/public/**/*.svg
+/public/**/*.mp4
+/public/**/*.avif
+/public/**/*.jfif
+
+# But allow these specific ones (whitelist):
+!/public/logo.png
+!/public/og-image.png
+!/public/favicon.png
+!/public/favicon.ico
+
+# ─── LOCAL DEVELOPMENT / SCRATCH FILES ─────────────────
+# Random files that snuck into data/
+data/bubbleChart.md
+data/delivery-testing.js
+data/*-testing.js
+data/image.png
+data/*.zip
+data/*_Locked.json
+
+# ─── UNUSED API ROUTES (DON'T DEPLOY) ──────────────────
+# Old test routes from prototyping
+app/api/route1.js
+pages/api/route1.js

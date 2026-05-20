@@ -1,0 +1,1706 @@
+[
+  {
+    "Symbol": "NIFTY",
+    "PRICE": "22318.4",
+    "CHANGE %": "-2.18",
+    "OI": "29861975",
+    "CHANGE OI %": "18.17",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "RBLBANK",
+    "PRICE": "290.1",
+    "CHANGE %": "-2.06",
+    "OI": "77403325",
+    "CHANGE OI %": "12.36",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BANKNIFTY",
+    "PRICE": "50247.6",
+    "CHANGE %": "-3.87",
+    "OI": "3608220",
+    "CHANGE OI %": "10.6",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "LT",
+    "PRICE": "3498.9",
+    "CHANGE %": "-1.49",
+    "OI": "18605300",
+    "CHANGE OI %": "9.18",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BOSCHLTD",
+    "PRICE": "28675",
+    "CHANGE %": "-3.19",
+    "OI": "252275",
+    "CHANGE OI %": "8.92",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PERSISTENT",
+    "PRICE": "4867.4",
+    "CHANGE %": "-0.63",
+    "OI": "5634500",
+    "CHANGE OI %": "8.58",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "INDUSINDBK",
+    "PRICE": "750.95",
+    "CHANGE %": "-5.14",
+    "OI": "43794800",
+    "CHANGE OI %": "8.51",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SOLARINDS",
+    "PRICE": "12062",
+    "CHANGE %": "-3.01",
+    "OI": "781700",
+    "CHANGE OI %": "7.95",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "IOC",
+    "PRICE": "135.41",
+    "CHANGE %": "-1.62",
+    "OI": "121611750",
+    "CHANGE OI %": "7.08",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "NUVAMA",
+    "PRICE": "1158.4",
+    "CHANGE %": "-2.63",
+    "OI": "1860000",
+    "CHANGE OI %": "6.84",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "APLAPOLLO",
+    "PRICE": "1941.3",
+    "CHANGE %": "-2.26",
+    "OI": "4959150",
+    "CHANGE OI %": "6.53",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "ADANIENT",
+    "PRICE": "1758.3",
+    "CHANGE %": "-3.54",
+    "OI": "21490023",
+    "CHANGE OI %": "6.48",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "OBEROIRLTY",
+    "PRICE": "1416.3",
+    "CHANGE %": "-1.91",
+    "OI": "9024750",
+    "CHANGE OI %": "6.09",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SBILIFE",
+    "PRICE": "1780.9",
+    "CHANGE %": "-3.06",
+    "OI": "10506750",
+    "CHANGE OI %": "5.78",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "EICHERMOT",
+    "PRICE": "6595.5",
+    "CHANGE %": "-3",
+    "OI": "3925000",
+    "CHANGE OI %": "5.59",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "KPITTECH",
+    "PRICE": "633.25",
+    "CHANGE %": "-3.86",
+    "OI": "8750750",
+    "CHANGE OI %": "5.54",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "HDFCBANK",
+    "PRICE": "732.15",
+    "CHANGE %": "-3.19",
+    "OI": "371956750",
+    "CHANGE OI %": "5.45",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "MAXHEALTH",
+    "PRICE": "960.8",
+    "CHANGE %": "-1.16",
+    "OI": "13434225",
+    "CHANGE OI %": "5.31",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "ASHOKLEY",
+    "PRICE": "154.25",
+    "CHANGE %": "-5.74",
+    "OI": "153725000",
+    "CHANGE OI %": "5.29",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BAJAJHLDNG",
+    "PRICE": "8733",
+    "CHANGE %": "-4.58",
+    "OI": "280900",
+    "CHANGE OI %": "5.17",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BRITANNIA",
+    "PRICE": "5439.5",
+    "CHANGE %": "-1.16",
+    "OI": "2650625",
+    "CHANGE OI %": "5.17",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "NIFTYNXT50",
+    "PRICE": "60258",
+    "CHANGE %": "-3.03",
+    "OI": "22825",
+    "CHANGE OI %": "5.06",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SAMMAANCAP",
+    "PRICE": "149.28",
+    "CHANGE %": "0.49",
+    "OI": "114431600",
+    "CHANGE OI %": "4.92",
+    "OI Analysis": "longBuildup"
+  },
+  {
+    "Symbol": "BAJAJ-AUTO",
+    "PRICE": "8784.5",
+    "CHANGE %": "-1.39",
+    "OI": "3875175",
+    "CHANGE OI %": "4.64",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "TATACONSUM",
+    "PRICE": "1015.4",
+    "CHANGE %": "-2.82",
+    "OI": "13361150",
+    "CHANGE OI %": "4.62",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BPCL",
+    "PRICE": "280.25",
+    "CHANGE %": "-0.59",
+    "OI": "72283025",
+    "CHANGE OI %": "4.58",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "NATIONALUM",
+    "PRICE": "385.85",
+    "CHANGE %": "4.28",
+    "OI": "62340000",
+    "CHANGE OI %": "4.53",
+    "OI Analysis": "longBuildup"
+  },
+  {
+    "Symbol": "MIDCPNIFTY",
+    "PRICE": "12156.4",
+    "CHANGE %": "-2.83",
+    "OI": "3504720",
+    "CHANGE OI %": "3.93",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "KOTAKBANK",
+    "PRICE": "352.7",
+    "CHANGE %": "-3.34",
+    "OI": "230754000",
+    "CHANGE OI %": "3.72",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "CANBK",
+    "PRICE": "123.45",
+    "CHANGE %": "-5.31",
+    "OI": "219645000",
+    "CHANGE OI %": "3.63",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BANKINDIA",
+    "PRICE": "136.99",
+    "CHANGE %": "-5.2",
+    "OI": "55312400",
+    "CHANGE OI %": "3.59",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PHOENIXLTD",
+    "PRICE": "1505.3",
+    "CHANGE %": "0.26",
+    "OI": "4162900",
+    "CHANGE OI %": "3.56",
+    "OI Analysis": "longBuildup"
+  },
+  {
+    "Symbol": "M&M",
+    "PRICE": "2955.5",
+    "CHANGE %": "-2.62",
+    "OI": "20266000",
+    "CHANGE OI %": "3.51",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BAJFINANCE",
+    "PRICE": "800.3",
+    "CHANGE %": "-5.05",
+    "OI": "78331500",
+    "CHANGE OI %": "3.46",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SUNPHARMA",
+    "PRICE": "1762.6",
+    "CHANGE %": "-1.59",
+    "OI": "22279600",
+    "CHANGE OI %": "3.36",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "ICICIPRULI",
+    "PRICE": "509.2",
+    "CHANGE %": "-3.92",
+    "OI": "18290950",
+    "CHANGE OI %": "3.33",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "CHOLAFIN",
+    "PRICE": "1352.5",
+    "CHANGE %": "-4.49",
+    "OI": "20953125",
+    "CHANGE OI %": "3.27",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "DABUR",
+    "PRICE": "410.7",
+    "CHANGE %": "-2.06",
+    "OI": "32433750",
+    "CHANGE OI %": "3.19",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "MAZDOCK",
+    "PRICE": "2064",
+    "CHANGE %": "-4.72",
+    "OI": "5663200",
+    "CHANGE OI %": "2.92",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "VOLTAS",
+    "PRICE": "1269.5",
+    "CHANGE %": "-3.99",
+    "OI": "12602250",
+    "CHANGE OI %": "2.88",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PFC",
+    "PRICE": "378.9",
+    "CHANGE %": "-4.34",
+    "OI": "65253500",
+    "CHANGE OI %": "2.8",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "FEDERALBNK",
+    "PRICE": "259.1",
+    "CHANGE %": "-3.5",
+    "OI": "93750000",
+    "CHANGE OI %": "2.72",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PAGEIND",
+    "PRICE": "31620",
+    "CHANGE %": "-0.64",
+    "OI": "323910",
+    "CHANGE OI %": "2.72",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BANKBARODA",
+    "PRICE": "247.65",
+    "CHANGE %": "-4.8",
+    "OI": "121171050",
+    "CHANGE OI %": "2.55",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "GODREJCP",
+    "PRICE": "985.3",
+    "CHANGE %": "-2.39",
+    "OI": "11609000",
+    "CHANGE OI %": "2.5",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PAYTM",
+    "PRICE": "957.1",
+    "CHANGE %": "-4.99",
+    "OI": "21224375",
+    "CHANGE OI %": "2.46",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "LICI",
+    "PRICE": "725.6",
+    "CHANGE %": "-5.47",
+    "OI": "9067800",
+    "CHANGE OI %": "2.44",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "TATASTEEL",
+    "PRICE": "191.46",
+    "CHANGE %": "-0.71",
+    "OI": "216683500",
+    "CHANGE OI %": "2.41",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "INOXWIND",
+    "PRICE": "75.37",
+    "CHANGE %": "-4.98",
+    "OI": "109377125",
+    "CHANGE OI %": "2.35",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PNB",
+    "PRICE": "100.54",
+    "CHANGE %": "-4.19",
+    "OI": "297280000",
+    "CHANGE OI %": "2.3",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "LICHSGFIN",
+    "PRICE": "496.1",
+    "CHANGE %": "-1.72",
+    "OI": "35101000",
+    "CHANGE OI %": "2.24",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "VBL",
+    "PRICE": "382.95",
+    "CHANGE %": "-1.58",
+    "OI": "45924750",
+    "CHANGE OI %": "2.15",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "WIPRO",
+    "PRICE": "187.35",
+    "CHANGE %": "-1.42",
+    "OI": "217659000",
+    "CHANGE OI %": "2.14",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "AXISBANK",
+    "PRICE": "1163.4",
+    "CHANGE %": "-3.39",
+    "OI": "74615625",
+    "CHANGE OI %": "2.05",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "NHPC",
+    "PRICE": "73.68",
+    "CHANGE %": "-3.65",
+    "OI": "81152000",
+    "CHANGE OI %": "1.88",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "ICICIBANK",
+    "PRICE": "1207.8",
+    "CHANGE %": "-2.05",
+    "OI": "135990400",
+    "CHANGE OI %": "1.84",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "DIVISLAB",
+    "PRICE": "5938",
+    "CHANGE %": "-1.07",
+    "OI": "2831400",
+    "CHANGE OI %": "1.83",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "TRENT",
+    "PRICE": "3287.8",
+    "CHANGE %": "-3.22",
+    "OI": "7204100",
+    "CHANGE OI %": "1.78",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BSE",
+    "PRICE": "2684.2",
+    "CHANGE %": "-3.6",
+    "OI": "7565625",
+    "CHANGE OI %": "1.76",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "NESTLEIND",
+    "PRICE": "1176.6",
+    "CHANGE %": "-1.47",
+    "OI": "17570000",
+    "CHANGE OI %": "1.73",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "COLPAL",
+    "PRICE": "1787.6",
+    "CHANGE %": "-5.12",
+    "OI": "6784650",
+    "CHANGE OI %": "1.66",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "CIPLA",
+    "PRICE": "1221.8",
+    "CHANGE %": "-1.4",
+    "OI": "14238375",
+    "CHANGE OI %": "1.65",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "TECHM",
+    "PRICE": "1390.3",
+    "CHANGE %": "0.17",
+    "OI": "22407600",
+    "CHANGE OI %": "1.65",
+    "OI Analysis": "longBuildup"
+  },
+  {
+    "Symbol": "BAJAJFINSV",
+    "PRICE": "1629.5",
+    "CHANGE %": "-3.58",
+    "OI": "12515250",
+    "CHANGE OI %": "1.64",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SWIGGY",
+    "PRICE": "261.35",
+    "CHANGE %": "-2.99",
+    "OI": "52001300",
+    "CHANGE OI %": "1.62",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "ITC",
+    "PRICE": "287.9",
+    "CHANGE %": "-2.29",
+    "OI": "170200000",
+    "CHANGE OI %": "1.58",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BIOCON",
+    "PRICE": "360.85",
+    "CHANGE %": "-2.25",
+    "OI": "34425000",
+    "CHANGE OI %": "1.57",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "HDFCAMC",
+    "PRICE": "2214.5",
+    "CHANGE %": "-4.18",
+    "OI": "7238400",
+    "CHANGE OI %": "1.54",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "DLF",
+    "PRICE": "503.7",
+    "CHANGE %": "-3.5",
+    "OI": "55185900",
+    "CHANGE OI %": "1.53",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "HDFCLIFE",
+    "PRICE": "591.4",
+    "CHANGE %": "-2.88",
+    "OI": "41465600",
+    "CHANGE OI %": "1.51",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "ADANIPORTS",
+    "PRICE": "1310.5",
+    "CHANGE %": "-1.85",
+    "OI": "21579250",
+    "CHANGE OI %": "1.48",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "KFINTECH",
+    "PRICE": "878.25",
+    "CHANGE %": "-3.15",
+    "OI": "2258500",
+    "CHANGE OI %": "1.46",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "MANAPPURAM",
+    "PRICE": "250.5",
+    "CHANGE %": "-1.44",
+    "OI": "55440000",
+    "CHANGE OI %": "1.45",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "LTF",
+    "PRICE": "239.5",
+    "CHANGE %": "-4.28",
+    "OI": "69421500",
+    "CHANGE OI %": "1.41",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "YESBANK",
+    "PRICE": "17.27",
+    "CHANGE %": "-4.53",
+    "OI": "1214050700",
+    "CHANGE OI %": "1.32",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BHARATFORG",
+    "PRICE": "1671.8",
+    "CHANGE %": "-2.69",
+    "OI": "7897500",
+    "CHANGE OI %": "1.31",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "MFSL",
+    "PRICE": "1490.8",
+    "CHANGE %": "-3.97",
+    "OI": "10769200",
+    "CHANGE OI %": "1.24",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "HAVELLS",
+    "PRICE": "1189.4",
+    "CHANGE %": "-3.54",
+    "OI": "8474000",
+    "CHANGE OI %": "1.21",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "IEX",
+    "PRICE": "114.63",
+    "CHANGE %": "-3.95",
+    "OI": "80756250",
+    "CHANGE OI %": "1.21",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SBIN",
+    "PRICE": "980",
+    "CHANGE %": "-3.8",
+    "OI": "87560250",
+    "CHANGE OI %": "1.18",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SUPREMEIND",
+    "PRICE": "3760.8",
+    "CHANGE %": "0.02",
+    "OI": "2113650",
+    "CHANGE OI %": "1.18",
+    "OI Analysis": "longBuildup"
+  },
+  {
+    "Symbol": "ICICIGI",
+    "PRICE": "1710.9",
+    "CHANGE %": "-2.12",
+    "OI": "5237375",
+    "CHANGE OI %": "1.17",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PATANJALI",
+    "PRICE": "456.25",
+    "CHANGE %": "-3.68",
+    "OI": "36498600",
+    "CHANGE OI %": "1.17",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BHARTIARTL",
+    "PRICE": "1781.4",
+    "CHANGE %": "-3.04",
+    "OI": "59859500",
+    "CHANGE OI %": "1.15",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "MARUTI",
+    "PRICE": "12286",
+    "CHANGE %": "-0.78",
+    "OI": "3858250",
+    "CHANGE OI %": "1.13",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PIDILITIND",
+    "PRICE": "1281.7",
+    "CHANGE %": "-2.69",
+    "OI": "7662500",
+    "CHANGE OI %": "1.1",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "JIOFIN",
+    "PRICE": "223.45",
+    "CHANGE %": "-3.66",
+    "OI": "166196700",
+    "CHANGE OI %": "1.05",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "CGPOWER",
+    "PRICE": "656.1",
+    "CHANGE %": "-1.71",
+    "OI": "18752700",
+    "CHANGE OI %": "0.92",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SHRIRAMFIN",
+    "PRICE": "872.1",
+    "CHANGE %": "-3.5",
+    "OI": "46189275",
+    "CHANGE OI %": "0.89",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "NTPC",
+    "PRICE": "371.75",
+    "CHANGE %": "-1.08",
+    "OI": "97603500",
+    "CHANGE OI %": "0.82",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PRESTIGE",
+    "PRICE": "1123.3",
+    "CHANGE %": "-3.96",
+    "OI": "6421050",
+    "CHANGE OI %": "0.81",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "GRASIM",
+    "PRICE": "2549.4",
+    "CHANGE %": "-2.4",
+    "OI": "14836500",
+    "CHANGE OI %": "0.64",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "HINDUNILVR",
+    "PRICE": "2053.7",
+    "CHANGE %": "-1.12",
+    "OI": "17732400",
+    "CHANGE OI %": "0.56",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "NMDC",
+    "PRICE": "76.15",
+    "CHANGE %": "-1.31",
+    "OI": "340011000",
+    "CHANGE OI %": "0.55",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "APOLLOHOSP",
+    "PRICE": "7426.5",
+    "CHANGE %": "-1.54",
+    "OI": "2558625",
+    "CHANGE OI %": "0.54",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "VEDL",
+    "PRICE": "654.6",
+    "CHANGE %": "0.74",
+    "OI": "60008150",
+    "CHANGE OI %": "0.54",
+    "OI Analysis": "longBuildup"
+  },
+  {
+    "Symbol": "MUTHOOTFIN",
+    "PRICE": "3159.2",
+    "CHANGE %": "-1.91",
+    "OI": "4399725",
+    "CHANGE OI %": "0.53",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "SIEMENS",
+    "PRICE": "2941.8",
+    "CHANGE %": "-3.47",
+    "OI": "2787750",
+    "CHANGE OI %": "0.4",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PREMIERENE",
+    "PRICE": "892.45",
+    "CHANGE %": "-0.02",
+    "OI": "9436900",
+    "CHANGE OI %": "0.38",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "INDHOTEL",
+    "PRICE": "571.4",
+    "CHANGE %": "-3.28",
+    "OI": "22453000",
+    "CHANGE OI %": "0.34",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "GLENMARK",
+    "PRICE": "2135.4",
+    "CHANGE %": "-1.31",
+    "OI": "11461500",
+    "CHANGE OI %": "0.31",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "HINDZINC",
+    "PRICE": "501.3",
+    "CHANGE %": "-1.71",
+    "OI": "45245375",
+    "CHANGE OI %": "0.28",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "TITAN",
+    "PRICE": "3950.6",
+    "CHANGE %": "-0.68",
+    "OI": "10071250",
+    "CHANGE OI %": "0.28",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "CROMPTON",
+    "PRICE": "223.1",
+    "CHANGE %": "-3.82",
+    "OI": "48704400",
+    "CHANGE OI %": "0.24",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "PIIND",
+    "PRICE": "2717.9",
+    "CHANGE %": "-3.73",
+    "OI": "3015425",
+    "CHANGE OI %": "0.24",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "BEL",
+    "PRICE": "400.65",
+    "CHANGE %": "-0.92",
+    "OI": "114471675",
+    "CHANGE OI %": "0.22",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "DELHIVERY",
+    "PRICE": "415.85",
+    "CHANGE %": "-2.66",
+    "OI": "27240600",
+    "CHANGE OI %": "0.19",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "LUPIN",
+    "PRICE": "2319.8",
+    "CHANGE %": "-0.94",
+    "OI": "7467250",
+    "CHANGE OI %": "0.19",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "UPL",
+    "PRICE": "566.75",
+    "CHANGE %": "-4.78",
+    "OI": "29553905",
+    "CHANGE OI %": "0.17",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "TCS",
+    "PRICE": "2358.8",
+    "CHANGE %": "-1.41",
+    "OI": "38399550",
+    "CHANGE OI %": "0.15",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "RELIANCE",
+    "PRICE": "1342.5",
+    "CHANGE %": "-0.39",
+    "OI": "98632500",
+    "CHANGE OI %": "0.13",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "LAURUSLABS",
+    "PRICE": "990.3",
+    "CHANGE %": "-1.79",
+    "OI": "19193000",
+    "CHANGE OI %": "0.1",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "JSWSTEEL",
+    "PRICE": "1120.6",
+    "CHANGE %": "-0.88",
+    "OI": "51151500",
+    "CHANGE OI %": "0.09",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "ULTRACEMCO",
+    "PRICE": "10725",
+    "CHANGE %": "-2.66",
+    "OI": "2406050",
+    "CHANGE OI %": "0.05",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "AUROPHARMA",
+    "PRICE": "1304.7",
+    "CHANGE %": "-0.47",
+    "OI": "21398300",
+    "CHANGE OI %": "0.01",
+    "OI Analysis": "shortBuildup"
+  },
+  {
+    "Symbol": "LTIM",
+    "PRICE": "4522.5",
+    "CHANGE %": "0",
+    "OI": "3161250",
+    "CHANGE OI %": "0",
+    "OI Analysis": "unChanged"
+  },
+  {
+    "Symbol": "IRCTC",
+    "PRICE": "812.45",
+    "CHANGE %": "0",
+    "OI": "17907750",
+    "CHANGE OI %": "0",
+    "OI Analysis": "unChanged"
+  },
+  {
+    "Symbol": "ADANIGREEN",
+    "PRICE": "805.8",
+    "CHANGE %": "-3.07",
+    "OI": "23552400",
+    "CHANGE OI %": "-0.05",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "AMBUJACEM",
+    "PRICE": "400.45",
+    "CHANGE %": "-2.01",
+    "OI": "64062600",
+    "CHANGE OI %": "-0.09",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "TATAPOWER",
+    "PRICE": "379.7",
+    "CHANGE %": "-1.54",
+    "OI": "63398350",
+    "CHANGE OI %": "-0.11",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "BHEL",
+    "PRICE": "245.3",
+    "CHANGE %": "-3.69",
+    "OI": "114996000",
+    "CHANGE OI %": "-0.15",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "INDIANB",
+    "PRICE": "846.5",
+    "CHANGE %": "-2.53",
+    "OI": "9260000",
+    "CHANGE OI %": "-0.19",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "INFY",
+    "PRICE": "1253.2",
+    "CHANGE %": "-1.49",
+    "OI": "85545200",
+    "CHANGE OI %": "-0.33",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "HAL",
+    "PRICE": "3486.2",
+    "CHANGE %": "-2.64",
+    "OI": "9290250",
+    "CHANGE OI %": "-0.35",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "MOTHERSON",
+    "PRICE": "105.18",
+    "CHANGE %": "-4.06",
+    "OI": "133571850",
+    "CHANGE OI %": "-0.37",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "PGEL",
+    "PRICE": "468.5",
+    "CHANGE %": "-3.83",
+    "OI": "16799800",
+    "CHANGE OI %": "-0.38",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "GAIL",
+    "PRICE": "137.6",
+    "CHANGE %": "0.44",
+    "OI": "97911450",
+    "CHANGE OI %": "-0.54",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "PETRONET",
+    "PRICE": "247.8",
+    "CHANGE %": "1.04",
+    "OI": "35678200",
+    "CHANGE OI %": "-0.58",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "RECLTD",
+    "PRICE": "305.1",
+    "CHANGE %": "-4.16",
+    "OI": "83118000",
+    "CHANGE OI %": "-0.75",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "UNOMINDA",
+    "PRICE": "1028.5",
+    "CHANGE %": "-1.82",
+    "OI": "4729450",
+    "CHANGE OI %": "-0.76",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "EXIDEIND",
+    "PRICE": "287.95",
+    "CHANGE %": "-4.16",
+    "OI": "30803400",
+    "CHANGE OI %": "-0.85",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ALKEM",
+    "PRICE": "5292.5",
+    "CHANGE %": "-0.57",
+    "OI": "1184500",
+    "CHANGE OI %": "-0.89",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "KAYNES",
+    "PRICE": "3424.8",
+    "CHANGE %": "-5.09",
+    "OI": "3824700",
+    "CHANGE OI %": "-0.95",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "POLYCAB",
+    "PRICE": "6829.5",
+    "CHANGE %": "-2.55",
+    "OI": "2130750",
+    "CHANGE OI %": "-1",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "FORTIS",
+    "PRICE": "793.25",
+    "CHANGE %": "-2.22",
+    "OI": "12822375",
+    "CHANGE OI %": "-1.02",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "HEROMOTOCO",
+    "PRICE": "5068",
+    "CHANGE %": "-1.52",
+    "OI": "3682200",
+    "CHANGE OI %": "-1.02",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "INDUSTOWER",
+    "PRICE": "417.65",
+    "CHANGE %": "-2.14",
+    "OI": "65635300",
+    "CHANGE OI %": "-1.09",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ONGC",
+    "PRICE": "285.15",
+    "CHANGE %": "1.15",
+    "OI": "130641750",
+    "CHANGE OI %": "-1.12",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "AUBANK",
+    "PRICE": "843",
+    "CHANGE %": "-4.38",
+    "OI": "26214000",
+    "CHANGE OI %": "-1.14",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "POWERGRID",
+    "PRICE": "295.55",
+    "CHANGE %": "0.17",
+    "OI": "74915100",
+    "CHANGE OI %": "-1.26",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "COALINDIA",
+    "PRICE": "451",
+    "CHANGE %": "0.97",
+    "OI": "59638950",
+    "CHANGE OI %": "-1.37",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "ABCAPITAL",
+    "PRICE": "291.65",
+    "CHANGE %": "-4.38",
+    "OI": "47823700",
+    "CHANGE OI %": "-1.42",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "MARICO",
+    "PRICE": "736.6",
+    "CHANGE %": "-0.85",
+    "OI": "28318800",
+    "CHANGE OI %": "-1.47",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "GODREJPROP",
+    "PRICE": "1467.2",
+    "CHANGE %": "-2.27",
+    "OI": "8259900",
+    "CHANGE OI %": "-1.51",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "IDEA",
+    "PRICE": "8.55",
+    "CHANGE %": "-3.82",
+    "OI": "6911418075",
+    "CHANGE OI %": "-1.53",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "JSWENERGY",
+    "PRICE": "470.75",
+    "CHANGE %": "-2.95",
+    "OI": "27852000",
+    "CHANGE OI %": "-1.56",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "HINDPETRO",
+    "PRICE": "334.85",
+    "CHANGE %": "-1.56",
+    "OI": "56774925",
+    "CHANGE OI %": "-1.61",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "OFSS",
+    "PRICE": "6709.5",
+    "CHANGE %": "-3.47",
+    "OI": "1639725",
+    "CHANGE OI %": "-1.61",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ADANIENSOL",
+    "PRICE": "932.2",
+    "CHANGE %": "-2.46",
+    "OI": "20072475",
+    "CHANGE OI %": "-1.62",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "KALYANKJIL",
+    "PRICE": "374.85",
+    "CHANGE %": "-3.4",
+    "OI": "25771275",
+    "CHANGE OI %": "-1.7",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "IDFCFIRSTB",
+    "PRICE": "58.8",
+    "CHANGE %": "-4.95",
+    "OI": "467905200",
+    "CHANGE OI %": "-1.73",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "DMART",
+    "PRICE": "3970.8",
+    "CHANGE %": "1.62",
+    "OI": "5442000",
+    "CHANGE OI %": "-1.84",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "360ONE",
+    "PRICE": "947.5",
+    "CHANGE %": "-3.2",
+    "OI": "3282000",
+    "CHANGE OI %": "-2",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "DIXON",
+    "PRICE": "9650",
+    "CHANGE %": "-3.58",
+    "OI": "2852200",
+    "CHANGE OI %": "-2",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "MANKIND",
+    "PRICE": "2004.7",
+    "CHANGE %": "-1.74",
+    "OI": "3119175",
+    "CHANGE OI %": "-2.03",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ETERNAL",
+    "PRICE": "228.37",
+    "CHANGE %": "-1.88",
+    "OI": "229252225",
+    "CHANGE OI %": "-2.11",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "HCLTECH",
+    "PRICE": "1345.1",
+    "CHANGE %": "-1.77",
+    "OI": "38176950",
+    "CHANGE OI %": "-2.15",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "AMBER",
+    "PRICE": "6546.5",
+    "CHANGE %": "-0.6",
+    "OI": "1135300",
+    "CHANGE OI %": "-2.24",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "LODHA",
+    "PRICE": "675.65",
+    "CHANGE %": "-3.1",
+    "OI": "22288500",
+    "CHANGE OI %": "-2.25",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "MCX",
+    "PRICE": "2385.9",
+    "CHANGE %": "-0.57",
+    "OI": "13488125",
+    "CHANGE OI %": "-2.37",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "DRREDDY",
+    "PRICE": "1257.4",
+    "CHANGE %": "-1.94",
+    "OI": "11808750",
+    "CHANGE OI %": "-2.4",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ASIANPAINT",
+    "PRICE": "2161.7",
+    "CHANGE %": "-2.13",
+    "OI": "14537750",
+    "CHANGE OI %": "-2.47",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "BANDHANBNK",
+    "PRICE": "141.41",
+    "CHANGE %": "-4.88",
+    "OI": "91504800",
+    "CHANGE OI %": "-2.62",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "GMRAIRPORT",
+    "PRICE": "84.78",
+    "CHANGE %": "-4.62",
+    "OI": "146405250",
+    "CHANGE OI %": "-2.62",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "TIINDIA",
+    "PRICE": "2524.3",
+    "CHANGE %": "-1.73",
+    "OI": "2694800",
+    "CHANGE OI %": "-2.62",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "TATAELXSI",
+    "PRICE": "3971.4",
+    "CHANGE %": "-4.82",
+    "OI": "1928700",
+    "CHANGE OI %": "-2.71",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "NYKAA",
+    "PRICE": "234.6",
+    "CHANGE %": "-1.82",
+    "OI": "46234375",
+    "CHANGE OI %": "-2.73",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "HINDALCO",
+    "PRICE": "882.65",
+    "CHANGE %": "1.86",
+    "OI": "50348900",
+    "CHANGE OI %": "-2.86",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "PNBHOUSING",
+    "PRICE": "753.1",
+    "CHANGE %": "-4.94",
+    "OI": "13128700",
+    "CHANGE OI %": "-2.88",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "OIL",
+    "PRICE": "476.1",
+    "CHANGE %": "-0.58",
+    "OI": "27185200",
+    "CHANGE OI %": "-2.95",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "CONCOR",
+    "PRICE": "424.35",
+    "CHANGE %": "-2.79",
+    "OI": "27676250",
+    "CHANGE OI %": "-3.03",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "JUBLFOOD",
+    "PRICE": "433.05",
+    "CHANGE %": "-4.83",
+    "OI": "25995000",
+    "CHANGE OI %": "-3.06",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ABB",
+    "PRICE": "5950.5",
+    "CHANGE %": "-2.31",
+    "OI": "2090250",
+    "CHANGE OI %": "-3.11",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "SRF",
+    "PRICE": "2434.1",
+    "CHANGE %": "-2.25",
+    "OI": "3651200",
+    "CHANGE OI %": "-3.17",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "LTM",
+    "PRICE": "4017",
+    "CHANGE %": "-4.7",
+    "OI": "3906000",
+    "CHANGE OI %": "-3.18",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "TORNTPOWER",
+    "PRICE": "1306.2",
+    "CHANGE %": "-3.75",
+    "OI": "3429775",
+    "CHANGE OI %": "-3.21",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "SONACOMS",
+    "PRICE": "480.35",
+    "CHANGE %": "-1.9",
+    "OI": "12999700",
+    "CHANGE OI %": "-3.25",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "SHREECEM",
+    "PRICE": "22985",
+    "CHANGE %": "-2.73",
+    "OI": "400775",
+    "CHANGE OI %": "-3.3",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "UNITDSPR",
+    "PRICE": "1217",
+    "CHANGE %": "-2.88",
+    "OI": "12754400",
+    "CHANGE OI %": "-3.31",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "POLICYBZR",
+    "PRICE": "1430.4",
+    "CHANGE %": "-1.97",
+    "OI": "8056650",
+    "CHANGE OI %": "-3.43",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "NBCC",
+    "PRICE": "77.43",
+    "CHANGE %": "-3.67",
+    "OI": "81744000",
+    "CHANGE OI %": "-3.45",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "SUZLON",
+    "PRICE": "39.49",
+    "CHANGE %": "-3.4",
+    "OI": "317427300",
+    "CHANGE OI %": "-3.45",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "MPHASIS",
+    "PRICE": "2052.2",
+    "CHANGE %": "-2.79",
+    "OI": "5422725",
+    "CHANGE OI %": "-3.58",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ASTRAL",
+    "PRICE": "1603.7",
+    "CHANGE %": "-1.09",
+    "OI": "9112000",
+    "CHANGE OI %": "-3.71",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "SAIL",
+    "PRICE": "152",
+    "CHANGE %": "3.02",
+    "OI": "179831400",
+    "CHANGE OI %": "-3.92",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "POWERINDIA",
+    "PRICE": "24265",
+    "CHANGE %": "-1.88",
+    "OI": "301050",
+    "CHANGE OI %": "-3.94",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "UNIONBANK",
+    "PRICE": "164.44",
+    "CHANGE %": "-6.02",
+    "OI": "107580600",
+    "CHANGE OI %": "-3.95",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "KEI",
+    "PRICE": "4033",
+    "CHANGE %": "-2.1",
+    "OI": "2066050",
+    "CHANGE OI %": "-4.09",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "SBICARD",
+    "PRICE": "635.1",
+    "CHANGE %": "-6.13",
+    "OI": "24963200",
+    "CHANGE OI %": "-4.09",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "TORNTPHARM",
+    "PRICE": "4219.5",
+    "CHANGE %": "-1.1",
+    "OI": "2808250",
+    "CHANGE OI %": "-4.16",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ZYDUSLIFE",
+    "PRICE": "871.35",
+    "CHANGE %": "-2.85",
+    "OI": "9455400",
+    "CHANGE OI %": "-4.24",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "WAAREEENER",
+    "PRICE": "3107.6",
+    "CHANGE %": "0.55",
+    "OI": "3551975",
+    "CHANGE OI %": "-4.71",
+    "OI Analysis": "shortCovering"
+  },
+  {
+    "Symbol": "CUMMINSIND",
+    "PRICE": "4506.4",
+    "CHANGE %": "-2.47",
+    "OI": "3522800",
+    "CHANGE OI %": "-4.89",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "COFORGE",
+    "PRICE": "1113.7",
+    "CHANGE %": "-2.69",
+    "OI": "21367875",
+    "CHANGE OI %": "-4.91",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "TMPV",
+    "PRICE": "295.8",
+    "CHANGE %": "-2.28",
+    "OI": "70292000",
+    "CHANGE OI %": "-4.97",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "NAUKRI",
+    "PRICE": "969.5",
+    "CHANGE %": "-2.14",
+    "OI": "10611750",
+    "CHANGE OI %": "-5.01",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "CAMS",
+    "PRICE": "623.9",
+    "CHANGE %": "-1.93",
+    "OI": "5505000",
+    "CHANGE OI %": "-5.33",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "JINDALSTEL",
+    "PRICE": "1111.8",
+    "CHANGE %": "-1.85",
+    "OI": "11588125",
+    "CHANGE OI %": "-5.33",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "DALBHARAT",
+    "PRICE": "1779.5",
+    "CHANGE %": "-3.78",
+    "OI": "2352675",
+    "CHANGE OI %": "-5.56",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "BLUESTARCO",
+    "PRICE": "1606.4",
+    "CHANGE %": "-4.4",
+    "OI": "2512575",
+    "CHANGE OI %": "-5.91",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "INDIGO",
+    "PRICE": "3941.1",
+    "CHANGE %": "-4.18",
+    "OI": "9373050",
+    "CHANGE OI %": "-6.31",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "BDL",
+    "PRICE": "1096.4",
+    "CHANGE %": "-3.91",
+    "OI": "5192600",
+    "CHANGE OI %": "-6.51",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "RVNL",
+    "PRICE": "249.55",
+    "CHANGE %": "-5.85",
+    "OI": "55055550",
+    "CHANGE OI %": "-6.9",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "CDSL",
+    "PRICE": "1118.1",
+    "CHANGE %": "-4.78",
+    "OI": "11188625",
+    "CHANGE OI %": "-8.18",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "IREDA",
+    "PRICE": "109",
+    "CHANGE %": "-4.74",
+    "OI": "56745600",
+    "CHANGE OI %": "-8.3",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "IRFC",
+    "PRICE": "87.05",
+    "CHANGE %": "-5.9",
+    "OI": "65862250",
+    "CHANGE OI %": "-8.55",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "TATATECH",
+    "PRICE": "508.7",
+    "CHANGE %": "-5.72",
+    "OI": "9048900",
+    "CHANGE OI %": "-8.63",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "ANGELONE",
+    "PRICE": "226.86",
+    "CHANGE %": "-3.31",
+    "OI": "32862500",
+    "CHANGE OI %": "-9.24",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "SYNGENE",
+    "PRICE": "389.5",
+    "CHANGE %": "-6.48",
+    "OI": "9989000",
+    "CHANGE OI %": "-10.08",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "TVSMOTOR",
+    "PRICE": "3362.1",
+    "CHANGE %": "-2.18",
+    "OI": "8532125",
+    "CHANGE OI %": "-11.22",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "PPLPHARMA",
+    "PRICE": "136.69",
+    "CHANGE %": "-4.31",
+    "OI": "14594500",
+    "CHANGE OI %": "-11.8",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "HUDCO",
+    "PRICE": "159.6",
+    "CHANGE %": "-5.17",
+    "OI": "32904200",
+    "CHANGE OI %": "-15.98",
+    "OI Analysis": "longUnwinding"
+  },
+  {
+    "Symbol": "FINNIFTY",
+    "PRICE": "23511.8",
+    "CHANGE %": "-3.57",
+    "OI": "57180",
+    "CHANGE OI %": "-31.04",
+    "OI Analysis": "longUnwinding"
+  }
+]
