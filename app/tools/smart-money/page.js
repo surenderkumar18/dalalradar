@@ -1,26 +1,12 @@
-// app/tools/bubble-chart/page.js
+// app/tools/smart-money/page.js
 //
-// 🎯 UPDATED: Hardcoded PHARMA default + URL state (?sector=PHARMA)
-//
-// Changes from original:
-// - Added useCallback to React imports
-// - Added Next.js navigation imports
-// - Added DEFAULT_SECTOR constant
-// - Replaced selectedSector useState with URL-aware version
-// - Added URL sync wrapper
-// - Added sector validation useEffect
-// - Added browser title useEffect (bonus)
-//
-// Everything else unchanged.
+// 🔒 PROTECTED: Signal engine moved to backend API (/api/signals)
+// - Bubbles render immediately (no signals first)
+// - Signals fetched async from protected backend
+// - Painted onto bubbles when API response arrives
 
 "use client";
 
-// 🆕 FIX: Force dynamic rendering — required for useSearchParams() to work
-// Without this, Next.js tries to pre-render the page at build time and fails
-// because useSearchParams() needs a real browser context.
-//
-// Trade-off: No static caching of this page (which is correct for a
-// data-heavy interactive tool anyway — we always want fresh data).
 export const dynamic = "force-dynamic";
 
 import React, {
@@ -30,10 +16,9 @@ import React, {
   useRef,
   useDeferredValue,
   useCallback,
-  Suspense, // 🆕 NEW: Required for useSearchParams() in Next.js 16
+  Suspense,
 } from "react";
 
-// 🆕 NEW: Next.js navigation hooks for URL state
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 import { mergeOiIntoRollover } from "@/app/utils/mergeOiIntoRollover";
@@ -55,24 +40,11 @@ import {
 const MemoHeader = React.memo(Header);
 const MemoFooter = React.memo(Footer);
 
-// 🔥 PERF FIX P3: stable empty-array reference at module scope
 const EMPTY_ARRAY = Object.freeze([]);
-
-// 🆕 NEW: Default sector when no URL param is present or invalid sector requested
 const DEFAULT_SECTOR = "PHARMA";
 
 // ═══════════════════════════════════════════════════════════════════════
-// 🆕 NEW: Outer wrapper with Suspense boundary
-//
-// Next.js 16 STRICTLY requires useSearchParams() to be inside a Suspense
-// boundary. Even with "force-dynamic", the prerender step still runs
-// briefly and trips on the hook.
-//
-// Solution: Split the component into TWO:
-//   1. Page() — Outer component, just wraps inner in <Suspense>
-//   2. BubbleChartContent() — Inner component, has all the logic
-//
-// This pattern is the OFFICIAL Next.js recommendation.
+// Outer wrapper with Suspense boundary
 // ═══════════════════════════════════════════════════════════════════════
 export default function Page() {
   return (
@@ -89,35 +61,24 @@ export default function Page() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// MAIN COMPONENT — all your existing logic is here.
-// Renamed from Page() → BubbleChartContent()
+// MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════
 function BubbleChartContent() {
-  // 🆕 NEW: URL state hooks
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // 🆕 NEW: Read sector from URL on mount, fallback to PHARMA
-  // .trim() handles edge cases like "?sector=%20ENERGY%20" with whitespace
   const urlSector = searchParams.get("sector")?.trim();
   const initialSector = urlSector || DEFAULT_SECTOR;
 
   const [sectors, setSectors] = useState([]);
   const [ticks, setTicks] = useState([]);
-
-  // 🆕 CHANGED: Default mode is "stock" since we have a default sector pre-selected
   const [mode, setMode] = useState(initialSector ? "stock" : "sector");
-
-  // 🆕 CHANGED: Use private setter (_setSelectedSector) — public wrapper added below
   const [selectedSector, _setSelectedSector] = useState(initialSector);
 
-  // 🆕 NEW: Public setter wrapper that syncs to URL
   const setSelectedSector = useCallback(
     (newSector) => {
       _setSelectedSector(newSector);
-
-      // Update URL without page reload
       const params = new URLSearchParams(window.location.search);
       if (newSector) {
         params.set("sector", newSector);
@@ -156,17 +117,31 @@ function BubbleChartContent() {
   const [dropIndex, setDropIndex] = useState(null);
   const [showTooltip, setShowTooltip] = useState(true);
   const [rolloverDataMap, setRolloverDataMap] = useState(null);
+
   const [pastDays, setPastDays] = useState(() => {
     if (typeof window === "undefined") return 90;
     const saved = localStorage.getItem("bubble_past_days");
     return saved === "all" ? null : saved ? Number(saved) : 90;
   });
 
+  // 🆕 Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 600);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   const [enableSignalEngine, setEnableSignalEngine] = useState(() => {
     if (typeof window === "undefined") return true;
     const saved = localStorage.getItem("enable_signal_engine");
     return saved === null ? true : saved === "true";
   });
+
+  // 🔒 NEW: signals fetched from protected backend
+  const [signalsMap, setSignalsMap] = useState({});
 
   useEffect(() => {
     localStorage.setItem("enable_signal_engine", String(enableSignalEngine));
@@ -264,7 +239,7 @@ function BubbleChartContent() {
     if (!timeline.length || !sectors.length) return;
     setActiveCategory(null);
     setHighlightStock(null);
-    setSelectedSector(sec); // ← This now also updates URL automatically
+    setSelectedSector(sec);
     if (sec !== null) {
       setMode("stock");
     }
@@ -312,7 +287,7 @@ function BubbleChartContent() {
       bubbleControls,
       rowPosition,
       rolloverDataMap,
-      enableSignalEngine,
+      false, // 🔒 enableSignalEngine = false (signals come from API)
     );
   }, [
     mode,
@@ -322,7 +297,6 @@ function BubbleChartContent() {
     bubbleControls,
     rowPosition,
     rolloverDataMap,
-    enableSignalEngine,
   ]);
 
   const { bubbles: allBubbleData, sectorPositions } = useMemo(() => {
@@ -362,7 +336,7 @@ function BubbleChartContent() {
       bubbleControls,
       rolloverDataMap,
       rowPosition,
-      enableSignalEngine,
+      false, // 🔒 enableSignalEngine = false (signals come from API)
     );
   }, [
     mode,
@@ -374,7 +348,6 @@ function BubbleChartContent() {
     bubbleControls,
     rolloverDataMap,
     rowPosition,
-    enableSignalEngine,
   ]);
 
   const allSymbols = useMemo(() => {
@@ -392,7 +365,7 @@ function BubbleChartContent() {
   }, [timeline]);
 
   function handleBack() {
-    setSelectedSector(null); // ← Also clears ?sector= from URL
+    setSelectedSector(null);
     setMode("sector");
   }
   const sectorRefs = useRef({});
@@ -418,7 +391,7 @@ function BubbleChartContent() {
       bubbleControls,
       rolloverDataMap,
       rowPosition,
-      enableSignalEngine,
+      false, // 🔒 enableSignalEngine = false (signals come from API)
     );
   }, [
     mode,
@@ -429,10 +402,10 @@ function BubbleChartContent() {
     bubbleControls,
     rolloverDataMap,
     rowPosition,
-    enableSignalEngine,
   ]);
 
-  const chartData = useMemo(() => {
+  // 🔧 RENAMED: original chartData → baseChartData (without signals)
+  const baseChartData = useMemo(() => {
     if (mode === "favorites") return favoriteBubbleData;
     if (mode === "all") return allBubbleData;
     if (mode === "sector") return sectorBubbleData;
@@ -445,6 +418,94 @@ function BubbleChartContent() {
     sectorBubbleData,
     stockBubbleData,
   ]);
+
+  // 🔒 NEW: chartData = baseChartData + signals from API
+  const chartData = useMemo(() => {
+    if (!baseChartData?.length) return baseChartData;
+    if (!enableSignalEngine || Object.keys(signalsMap).length === 0) {
+      return baseChartData;
+    }
+    return baseChartData.map((b) => {
+      const key = b.stock || b.sector;
+      const lookupKey = `${key}-${b.x}`;
+      const sig = signalsMap[lookupKey];
+      if (!sig) return b;
+      return {
+        ...b,
+        bubbleSignal: sig.bubbleSignal,
+        signalValidation: sig.signalValidation,
+        hasBuySignal: sig.bubbleSignal?.type === "BUY",
+        hasSellSignal: sig.bubbleSignal?.type === "SELL",
+        hasWarnSignal: sig.bubbleSignal?.type === "WARN",
+      };
+    });
+  }, [baseChartData, signalsMap, enableSignalEngine]);
+
+  // 🔒 NEW: Fetch signals from protected backend API
+  useEffect(() => {
+    if (!enableSignalEngine) {
+      setSignalsMap({});
+      return;
+    }
+
+    if (!baseChartData?.length) {
+      setSignalsMap({});
+      return;
+    }
+
+    // Group bubbles by key (stock or sector)
+    const bubblesByKey = {};
+    for (const b of baseChartData) {
+      const key = b.stock || b.sector;
+      if (!key) continue;
+      if (!bubblesByKey[key]) bubblesByKey[key] = [];
+      bubblesByKey[key].push({
+        x: b.x,
+        price: b.price,
+        delivery: b.delivery,
+        volume: b.volume,
+        oi: b.oi,
+        oiChangePct: b.oiChangePct,
+        turnover: b.turnover,
+        turnoverChange: b.turnoverChange,
+        moneyFlowScore: b.moneyFlowScore,
+      });
+    }
+
+    // Sort each key's bubbles chronologically
+    for (const key of Object.keys(bubblesByKey)) {
+      bubblesByKey[key].sort((a, b) => a.x - b.x);
+    }
+
+    let cancelled = false;
+    fetch("/api/signals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bubblesByKey }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        // Build lookup: "STOCK-timestamp" → { bubbleSignal, signalValidation }
+        const lookup = {};
+        for (const [key, arr] of Object.entries(data.signals || {})) {
+          const sortedX = bubblesByKey[key].map((b) => b.x);
+          arr.forEach((sig, i) => {
+            if (sig?.bubbleSignal) {
+              lookup[`${key}-${sortedX[i]}`] = sig;
+            }
+          });
+        }
+        setSignalsMap(lookup);
+      })
+      .catch((err) => {
+        console.warn("Signals fetch failed:", err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [enableSignalEngine, baseChartData]);
 
   const chartCategories = useMemo(() => {
     return mode === "sector"
@@ -538,28 +599,20 @@ function BubbleChartContent() {
     init();
   }, []);
 
-  // 🆕 UPDATED: Validate URL sector once sectors data is loaded
-  // If invalid sector in URL, switch to "sector" mode (show all sectors view)
-  // This lets user pick from the full list instead of being dumped into PHARMA
+  // Validate URL sector once sectors data is loaded
   useEffect(() => {
     if (!sectors || sectors.length === 0) return;
-
-    // Skip validation if no sector is currently selected (already in sector mode)
     if (!selectedSector) return;
 
-    // Check if current selectedSector is valid
     const isValid = sectors.includes(selectedSector);
 
     if (!isValid) {
       console.log(
         `⚠️ Invalid sector "${selectedSector}", switching to sector overview`,
       );
-
-      // Clear the selected sector and switch to "all sectors" view
       _setSelectedSector(null);
       setMode("sector");
 
-      // Remove ?sector= from URL
       const params = new URLSearchParams(window.location.search);
       params.delete("sector");
       const queryString = params.toString();
@@ -569,12 +622,12 @@ function BubbleChartContent() {
     }
   }, [sectors, selectedSector, pathname, router]);
 
-  // 🆕 NEW: Bonus polish — browser tab title shows current sector
+  // Browser tab title shows current sector
   useEffect(() => {
     if (selectedSector) {
       document.title = `${selectedSector} — DalalRadar`;
     } else {
-      document.title = "Bubble Chart — DalalRadar";
+      document.title = "Smart Money Radar — DalalRadar";
     }
   }, [selectedSector]);
 
@@ -591,7 +644,7 @@ function BubbleChartContent() {
   const handleSearch = (stock, sectorFromSearch) => {
     const sector = sectorFromSearch || stockToSectorMap[stock];
     if (!sector) return;
-    setSelectedSector(sector); // ← also updates URL
+    setSelectedSector(sector);
     setMode("stock");
     setHighlightStock(stock);
   };
@@ -639,101 +692,134 @@ function BubbleChartContent() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
-      <main className="flex-1 overflow-y-auto overflow-x-hidden">
-        <section className="h-screen flex flex-col">
-          <div className="flex-1">
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                minHeight: 0,
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
-                }}
-              >
-                <MemoHeader
-                  useShouldApplyControls={useShouldApplyControls}
-                  setUseShouldApplyControls={setUseShouldApplyControls}
-                  useRelative={useRelative}
-                  setUseRelative={setUseRelative}
-                  bubbleControls={bubbleControls}
-                  setBubbleControls={setBubbleControls}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  setSelectedSector={setSelectedSector}
-                  allSymbols={allSymbols}
-                  onSearch={handleSearch}
-                  rowPosition={rowPosition}
-                  setRowPosition={setRowPosition}
-                  fixTooltip={fixTooltip}
-                  setFixTooltip={setFixTooltip}
-                  hideBands={hideBands}
-                  setHideBands={setHideBands}
-                  mode={mode}
-                  setMode={setMode}
-                  setActiveCategory={setActiveCategory}
-                  showWatermark={showWatermark}
-                  setShowWatermark={setShowWatermark}
-                  showTooltip={showTooltip}
-                  setShowTooltip={setShowTooltip}
-                  setHighlightStock={setHighlightStock}
-                  pastDays={pastDays}
-                  setPastDays={setPastDays}
-                  enableSignalEngine={enableSignalEngine}
-                  setEnableSignalEngine={setEnableSignalEngine}
-                />
-                <TimelineBubble
-                  data={displayData}
-                  categories={displayCategories}
-                  ticks={displayTicks}
-                  mode={mode}
-                  setMode={setMode}
-                  selectedSector={selectedSector}
-                  onSectorClick={handleSectorClick}
-                  onBack={handleBack}
-                  sectors={sectors}
-                  setSelectedSector={setSelectedSector}
-                  sectorPositions={sectorPositions}
-                  allowedSectors={EMPTY_ARRAY}
-                  useRelative={useRelative}
-                  setUseRelative={setUseRelative}
-                  useShouldApplyControls={useShouldApplyControls}
-                  setUseShouldApplyControls={setUseShouldApplyControls}
-                  bubbleControls={bubbleControls}
-                  setBubbleControls={setBubbleControls}
-                  rowPosition={rowPosition}
-                  setRowPosition={setRowPosition}
-                  onSearch={handleSearch}
-                  stockToSectorMap={stockToSectorMap}
-                  allStocks={allStocks}
-                  highlightStock={highlightStock}
-                  allSymbols={allSymbols}
-                  hideBands={hideBands}
-                  fixTooltip={fixTooltip}
-                  activeCategory={activeCategory}
-                  setActiveCategory={setActiveCategory}
-                  showWatermark={showWatermark}
-                  toggleFavorite={toggleFavorite}
-                  favoriteStocks={favoriteStocks}
-                  showTooltip={showTooltip}
-                  enableSignalEngine={enableSignalEngine}
-                  setEnableSignalEngine={setEnableSignalEngine}
-                />
+    <div
+      style={{
+        overflowX: isMobile ? "auto" : "visible",
+        WebkitOverflowScrolling: "touch",
+        width: "100%",
+      }}
+    >
+      {isMobile && (
+        <div
+          style={{
+            position: "sticky",
+            left: 0,
+            background: "rgba(0,255,162,0.1)",
+            borderBottom: "1px solid rgba(0,255,162,0.25)",
+            padding: "6px 12px",
+            fontSize: 11,
+            color: "#00ffa2",
+            textAlign: "center",
+            fontWeight: 600,
+            zIndex: 1000,
+          }}
+        >
+          👆 Swipe horizontally · Best on desktop
+        </div>
+      )}
+      <div
+        style={{
+          minWidth: isMobile ? 1280 : "auto",
+          width: isMobile ? 1280 : "100%",
+        }}
+      >
+        <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden">
+            <section className="h-screen flex flex-col">
+              <div className="flex-1">
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    minHeight: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "100%",
+                    }}
+                  >
+                    <MemoHeader
+                      useShouldApplyControls={useShouldApplyControls}
+                      setUseShouldApplyControls={setUseShouldApplyControls}
+                      useRelative={useRelative}
+                      setUseRelative={setUseRelative}
+                      bubbleControls={bubbleControls}
+                      setBubbleControls={setBubbleControls}
+                      searchQuery={searchQuery}
+                      setSearchQuery={setSearchQuery}
+                      setSelectedSector={setSelectedSector}
+                      allSymbols={allSymbols}
+                      onSearch={handleSearch}
+                      rowPosition={rowPosition}
+                      setRowPosition={setRowPosition}
+                      fixTooltip={fixTooltip}
+                      setFixTooltip={setFixTooltip}
+                      hideBands={hideBands}
+                      setHideBands={setHideBands}
+                      mode={mode}
+                      setMode={setMode}
+                      setActiveCategory={setActiveCategory}
+                      showWatermark={showWatermark}
+                      setShowWatermark={setShowWatermark}
+                      showTooltip={showTooltip}
+                      setShowTooltip={setShowTooltip}
+                      setHighlightStock={setHighlightStock}
+                      pastDays={pastDays}
+                      setPastDays={setPastDays}
+                      enableSignalEngine={enableSignalEngine}
+                      setEnableSignalEngine={setEnableSignalEngine}
+                    />
+                    <TimelineBubble
+                      data={displayData}
+                      categories={displayCategories}
+                      ticks={displayTicks}
+                      mode={mode}
+                      setMode={setMode}
+                      selectedSector={selectedSector}
+                      onSectorClick={handleSectorClick}
+                      onBack={handleBack}
+                      sectors={sectors}
+                      setSelectedSector={setSelectedSector}
+                      sectorPositions={sectorPositions}
+                      allowedSectors={EMPTY_ARRAY}
+                      useRelative={useRelative}
+                      setUseRelative={setUseRelative}
+                      useShouldApplyControls={useShouldApplyControls}
+                      setUseShouldApplyControls={setUseShouldApplyControls}
+                      bubbleControls={bubbleControls}
+                      setBubbleControls={setBubbleControls}
+                      rowPosition={rowPosition}
+                      setRowPosition={setRowPosition}
+                      onSearch={handleSearch}
+                      stockToSectorMap={stockToSectorMap}
+                      allStocks={allStocks}
+                      highlightStock={highlightStock}
+                      allSymbols={allSymbols}
+                      hideBands={hideBands}
+                      fixTooltip={fixTooltip}
+                      activeCategory={activeCategory}
+                      setActiveCategory={setActiveCategory}
+                      showWatermark={showWatermark}
+                      toggleFavorite={toggleFavorite}
+                      favoriteStocks={favoriteStocks}
+                      showTooltip={showTooltip}
+                      enableSignalEngine={enableSignalEngine}
+                      setEnableSignalEngine={setEnableSignalEngine}
+                    />
+                  </div>
+                  <MemoFooter {...memoFooterProps} />
+                </div>
               </div>
-              <MemoFooter {...memoFooterProps} />
-            </div>
-          </div>
-        </section>
-      </main>
+            </section>
+          </main>
+        </div>
+      </div>
     </div>
   );
 }

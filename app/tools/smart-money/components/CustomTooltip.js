@@ -5,7 +5,7 @@ import {
   resolveBubbleColor,
   formatTurnoverCr,
   formatMoney,
-} from "@/app/tools/bubble-chart/utils/bubbleEngineSub";
+} from "@/app/tools/smart-money/utils/bubbleEngineSub";
 
 import PremiumFeature from "@/components/PremiumFeature";
 

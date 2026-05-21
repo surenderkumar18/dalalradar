@@ -8,12 +8,11 @@ import React, {
   useRef,
   useLayoutEffect,
 } from "react";
-import { resolveSignalStyle } from "../utils/bubbleSignalEngine.js";
 
-import {
-  resolveBubbleColor,
-} from "@/app/tools/bubble-chart/utils/bubbleEngineSub.js";
-import CustomTooltip from "./CustomTooltip";
+import { resolveSignalStyle } from "../utils/signalStyles.js";
+
+import { resolveBubbleColor } from "@/app/tools/smart-money/utils/bubbleEngineSub.js";
+import CustomTooltip from "./CustomTooltip.js";
 
 import {
   ScatterChart,
@@ -392,6 +391,26 @@ function TimelineBubble({
   const activeDateRef = useRef(activeDate);
   const expiryColorMapRef = useRef({});
   const hoveredKeyRef = useRef(null);
+
+  const [viewportScale, setViewportScale] = useState(1);
+
+  useEffect(() => {
+    function updateScale() {
+      const w = window.innerWidth;
+      if (w < 480)
+        setViewportScale(0.3); // tiny phone
+      else if (w < 768)
+        setViewportScale(0.4); // phone
+      else if (w < 1024)
+        setViewportScale(0.5); // tablet/landscape phone ← was 0.75
+      else if (w < 1280)
+        setViewportScale(0.75); // small laptop
+      else setViewportScale(1); // desktop
+    }
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, []);
 
   useEffect(() => {
     activeDateRef.current = activeDate;
@@ -787,13 +806,13 @@ function TimelineBubble({
         if (size <= 6) opacity = Math.min(opacity, 0.4);
 
         const isLeader = topSectorSetRef.current.has(payload.sector);
-        const SAFE_R = mode === "all" ? 18 : 40;
+        const SAFE_R = mode === "all" ? 18 * viewportScale : 40 * viewportScale;
         const rBase = size / 2;
 
         let r =
           mode === "all"
-            ? Math.min(rBase * 0.5, 18)
-            : Math.min(rBase * 0.7, 40);
+            ? Math.min(rBase * 0.5 * viewportScale, 18 * viewportScale)
+            : Math.min(rBase * 0.7 * viewportScale, 40 * viewportScale);
 
         if (isLeader) r = r * 1.2;
         r = Math.min(r, SAFE_R);
@@ -908,7 +927,7 @@ function TimelineBubble({
           </g>
         );
       },
-    [mode, latestDate, rowPosition, bubbleRefCallback],
+    [mode, latestDate, rowPosition, bubbleRefCallback, viewportScale],
   );
 
   // =====================================================================
@@ -956,14 +975,14 @@ function TimelineBubble({
 
         const isLeader = topSectorSetRef.current.has(payload.sector);
 
-        const SAFE_R = mode === "all" ? 18 : 40;
+        const SAFE_R = mode === "all" ? 18 * viewportScale : 40 * viewportScale;
 
         const rBase = size / 2;
 
         let r =
           mode === "all"
-            ? Math.min(rBase * 0.5, 18)
-            : Math.min(rBase * 0.7, 40);
+            ? Math.min(rBase * 0.5 * viewportScale, 18 * viewportScale)
+            : Math.min(rBase * 0.7 * viewportScale, 40 * viewportScale);
 
         const maxSize =
           mode === "all" ? (isRecent ? 32 : 18) : isRecent ? 55 : 35;
@@ -1100,7 +1119,14 @@ function TimelineBubble({
           </g>
         );
       },
-    [mode, latestDate, rowPosition, expiryGroupMap, bubbleRefCallback],
+    [
+      mode,
+      latestDate,
+      rowPosition,
+      expiryGroupMap,
+      bubbleRefCallback,
+      viewportScale,
+    ],
   );
 
   const sectorLabelData = useMemo(() => {

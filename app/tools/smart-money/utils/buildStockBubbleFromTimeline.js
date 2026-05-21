@@ -9,12 +9,11 @@ import {
   buildFinalBubble,
   resolveRowY,
   detectSmartEntry,
-} from "@/app/tools/bubble-chart/utils/bubbleEngine.js";
+} from "@/app/tools/smart-money/utils/bubbleEngine.js";
 
-import {
-  detectBubbleSignal,
-  applySignalValidation,
-} from "./bubbleSignalEngine.js";
+// TEMP: signal engine moved to backend
+const detectBubbleSignal = () => null;
+const applySignalValidation = () => {};
 
 import config from "./config.js";
 
