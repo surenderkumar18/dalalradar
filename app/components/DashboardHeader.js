@@ -11,7 +11,7 @@ export default function DashboardHeader({ children }) {
   return (
     <div className="dr-nav">
       {/* LEFT: Logo */}
-      <a href="/" className="dashboard-logo">
+      <a href="https://dalalradar.com" className="dashboard-logo">
         <span className="dashboard-logo-mark">
           <svg viewBox="0 0 28 28" width="100%" height="100%">
             <circle cx="14" cy="14" r="12" fill="none" stroke="var(--green)" strokeWidth="1.5" opacity="0.4" />
