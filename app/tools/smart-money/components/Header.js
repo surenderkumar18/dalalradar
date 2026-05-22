@@ -1,4 +1,9 @@
+// app\tools\smart-money\components\Header.js
+
 "use client";
+
+import DashboardHeader from "@/app/components/DashboardHeader";
+import { canShowOnDevice } from "@/app/utils/deviceVisibility";
 import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import BubbleSizeControl from "./BubbleSizeControl";
@@ -41,6 +46,19 @@ export default function Header({
 }) {
   const [showViewPanel, setShowViewPanel] = useState(false);
   const panelRef = useRef();
+  const [screenWidth, setScreenWidth] = useState(1600);
+
+  useEffect(() => {
+    const update = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    update();
+
+    window.addEventListener("resize", update);
+
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   useEffect(() => {
     function handleClick(e) {
@@ -113,402 +131,284 @@ export default function Header({
         position: "sticky",
         top: 0,
         zIndex: 100,
-
-        display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
 
         background: "rgba(2,6,23,0.95)",
         backdropFilter: "blur(8px)",
-
-        padding: "10px 14px",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         gap: "12px",
-        paddingTop: 10,
       }}
     >
-      {/* 🔹 LEFT: TITLE + BACK */}
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <a href="/" className="dashboard-logo">
-          <span className="dashboard-logo-mark">
-            <svg viewBox="0 0 28 28" width="28" height="28">
-              <circle
-                cx="14"
-                cy="14"
-                r="12"
-                fill="none"
-                stroke="var(--green)"
-                strokeWidth="1.5"
-                opacity="0.4"
-              />
-              <circle
-                cx="14"
-                cy="14"
-                r="7"
-                fill="none"
-                stroke="var(--green)"
-                strokeWidth="1.5"
-                opacity="0.7"
-              />
-              <circle cx="14" cy="14" r="2.5" fill="var(--green)" />
-              <line
-                x1="14"
-                y1="2"
-                x2="14"
-                y2="6"
-                stroke="var(--green)"
-                strokeWidth="1"
-              />
-              <line
-                x1="14"
-                y1="22"
-                x2="14"
-                y2="26"
-                stroke="var(--green)"
-                strokeWidth="1"
-              />
-              <line
-                x1="2"
-                y1="14"
-                x2="6"
-                y2="14"
-                stroke="var(--green)"
-                strokeWidth="1"
-              />
-              <line
-                x1="22"
-                y1="14"
-                x2="26"
-                y2="14"
-                stroke="var(--green)"
-                strokeWidth="1"
-              />
-            </svg>
-          </span>
-          <span className="dashboard-logo-text">
-            Dalal<span className="dashboard-logo-em">Radar</span>
-          </span>
-        </a>
-        {/* 
-        <h1
-          style={{
-            fontSize: 32,
-            fontWeight: 700,
-            color: "#c084fc",
-            paddingLeft: 20,
-          }}
-        >
-          Smart Money Radar -{" "}
-          <span
-            style={{
-              fontWeight: 600,
-              fontSize: 22,
-              color: "#3896fa",
-              display: "inline-block",
-            }}
-          >
-            Participation{" "}
-            <span
-              style={{
-                color: "#c084fc",
-              }}
-            >
-              &
-            </span>{" "}
-            Intent
-          </span>
-        </h1>*/}
-      </div>
-
-      {/* 🔹 RIGHT: CONTROLS */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-            alignItems: "top",
-          }}
-        >
-          <div className="search-wrapper">
+      <DashboardHeader>
+        {/* 🔹 RIGHT: CONTROLS */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {canShowOnDevice("STOCK_SEARCH", screenWidth) && (
             <div
               style={{
-                position: "relative",
-                zIndex: 200,
-                width: 420,
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+                alignItems: "top",
               }}
             >
-              <MemoSearch
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                setSectorFilter={setSelectedSector}
-                allSymbols={allSymbols}
-                onSearch={onSearch}
-              />
+              <div className="search-wrapper">
+                <div
+                  style={{
+                    position: "relative",
+                    zIndex: 200,
+                  }}
+                >
+                  <MemoSearch
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    setSectorFilter={setSelectedSector}
+                    allSymbols={allSymbols}
+                    onSearch={onSearch}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <PremiumFeature feature="APPLY_CONTROLS" showLocked>
-          <label
-            className="custom-checkbox"
-            style={{
-              marginLeft: 20,
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={useShouldApplyControls}
-              onChange={(e) => {
-                const checked = e.target.checked;
+          )}
+          {canShowOnDevice("APPLY_CONTROLS", screenWidth) && (
+            <PremiumFeature feature="APPLY_CONTROLS" showLocked>
+              <label
+                className="custom-checkbox"
+                style={{
+                  marginLeft: 20,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={useShouldApplyControls}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
 
-                setUseShouldApplyControls(checked);
+                    setUseShouldApplyControls(checked);
 
-                if (checked) {
-                  // ✅ ON → Enable full engine
-                  setUseRelative(true);
+                    if (checked) {
+                      // ✅ ON → Enable full engine
+                      setUseRelative(true);
 
-                  setBubbleControls({
-                    price: true,
-                    volume: true,
-                    delivery: true,
-                    oi: true,
-                  });
-                } else {
-                  // ❌ OFF → Clean base state
-                  setUseRelative(false);
+                      setBubbleControls({
+                        price: true,
+                        volume: true,
+                        delivery: true,
+                        oi: true,
+                      });
+                    } else {
+                      // ❌ OFF → Clean base state
+                      setUseRelative(false);
 
-                  setBubbleControls({
-                    price: false,
-                    volume: false,
-                    delivery: false,
-                    oi: false,
-                  });
-                }
+                      setBubbleControls({
+                        price: false,
+                        volume: false,
+                        delivery: false,
+                        oi: false,
+                      });
+                    }
+                  }}
+                />
+                <span className="checkmark" />
+                <span className="label-text">Apply Controls</span>
+              </label>
+            </PremiumFeature>
+          )}
+          <PremiumFeature feature="APPLY_CONTROLS">
+            <BubbleSizeControl
+              controls={bubbleControls}
+              setControls={setBubbleControls}
+              useShouldApplyControls={useShouldApplyControls}
+            />
+            <label
+              className="custom-checkbox"
+              style={{
+                marginLeft: 20,
+                // ✅ ADD THESE
+                opacity: useShouldApplyControls ? 1 : 0.4,
+                cursor: useShouldApplyControls ? "pointer" : "not-allowed",
+                pointerEvents: useShouldApplyControls ? "auto" : "none",
               }}
-            />
-            <span className="checkmark" />
-            <span className="label-text">Apply Controls</span>
-          </label>
-        </PremiumFeature>
-        <PremiumFeature feature="APPLY_CONTROLS">
-          <BubbleSizeControl
-            controls={bubbleControls}
-            setControls={setBubbleControls}
-            useShouldApplyControls={useShouldApplyControls}
-          />
-          <label
-            className="custom-checkbox"
-            style={{
-              marginLeft: 20,
-              // ✅ ADD THESE
-              opacity: useShouldApplyControls ? 1 : 0.4,
-              cursor: useShouldApplyControls ? "pointer" : "not-allowed",
-              pointerEvents: useShouldApplyControls ? "auto" : "none",
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={useRelative}
-              disabled={!useShouldApplyControls}
-              onChange={(e) => setUseRelative(e.target.checked)}
-            />
-            <span className="checkmark" />
-            <span className="label-text">Relative Size</span>
-          </label>
-        </PremiumFeature>
-      </div>
+            >
+              <input
+                type="checkbox"
+                checked={useRelative}
+                disabled={!useShouldApplyControls}
+                onChange={(e) => setUseRelative(e.target.checked)}
+              />
+              <span className="checkmark" />
+              <span className="label-text">Relative Size</span>
+            </label>
+          </PremiumFeature>
+        </div>
 
-      {/* 🔘 Past Days */}
-      {/* 🔘 Past Days */}
-      <CustomDropdown
-        label="Past Days"
-        width={150}
-        value={pastDays}
-        onChange={setPastDays}
-        options={[
-          { value: 30, label: "30 Days" },
-          { value: 45, label: "45 Days" },
-          { value: 60, label: "60 Days" },
-          { value: 75, label: "75 Days" },
-          { value: 90, label: "90 Days" },
-          { value: 120, label: "120 Days", premium: true }, // 🔒 Premium
-          { value: 180, label: "180 Days", premium: true }, // 🔒 Premium
-          { value: null, label: "All Data", premium: true }, // 🔒 Premium
-        ]}
-      />
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        {/* 🔘 Past Days */}
+        {/* 🔘 Past Days */}
         <CustomDropdown
-          label="Bubble Position"
-          width={110}
-          value={rowPosition}
-          onChange={setRowPosition}
+          label="Past Days"
+          width={150}
+          value={pastDays}
+          onChange={setPastDays}
           options={[
-            { value: "top", label: "Top" },
-            { value: "center", label: "Center" },
-            { value: "bottom", label: "Bottom" },
+            { value: 30, label: "30 Days" },
+            { value: 45, label: "45 Days" },
+            { value: 60, label: "60 Days" },
+            { value: 75, label: "75 Days" },
+            { value: 90, label: "90 Days" },
+            { value: 120, label: "120 Days", premium: true }, // 🔒 Premium
+            { value: 180, label: "180 Days", premium: true }, // 🔒 Premium
+            { value: null, label: "All Data", premium: true }, // 🔒 Premium
           ]}
         />
-        <div ref={panelRef} style={{ position: "relative" }}>
-          {/* 🔘 BUTTON */}
-          <button
-            onClick={() => setShowViewPanel((v) => !v)}
-            style={{
-              padding: "6px 12px",
-              borderRadius: showViewPanel ? "4px 4px 0px 0px" : 6,
-              background: showViewPanel
-                ? "rgba(2,6,23,0.98)"
-                : "rgba(30,41,59,0.9)",
-              color: "#e5e7eb",
+        {canShowOnDevice("BUBBLE_POSITION", screenWidth) && (
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <CustomDropdown
+              label="Bubble Position"
+              width={110}
+              value={rowPosition}
+              onChange={setRowPosition}
+              options={[
+                { value: "top", label: "Top" },
+                { value: "center", label: "Center" },
+                { value: "bottom", label: "Bottom" },
+              ]}
+            />
 
-              // 🔥 DYNAMIC BORDER
-              border: showViewPanel
-                ? "1px solid #facc15"
-                : "1px solid rgba(255,255,255,0.1)",
+            <div ref={panelRef} style={{ position: "relative" }}>
+              {/* 🔘 BUTTON */}
+              <button
+                onClick={() => setShowViewPanel((v) => !v)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: showViewPanel ? "4px 4px 0px 0px" : 6,
+                  background: showViewPanel
+                    ? "rgba(2,6,23,0.98)"
+                    : "rgba(30,41,59,0.9)",
+                  color: "#e5e7eb",
 
-              borderBottom: showViewPanel
-                ? "0px solid #facc15"
-                : "1px solid rgba(255,255,255,0.1)",
+                  // 🔥 DYNAMIC BORDER
+                  border: showViewPanel
+                    ? "1px solid #facc15"
+                    : "1px solid rgba(255,255,255,0.1)",
 
-              cursor: "pointer",
-              fontWeight: 600,
-              transition: "all 0.2s ease",
-            }}
-          >
-            ⚙ View
-          </button>
+                  borderBottom: showViewPanel
+                    ? "0px solid #facc15"
+                    : "1px solid rgba(255,255,255,0.1)",
 
-          {/* 📦 PANEL */}
-          {showViewPanel && (
-            <div
-              style={{
-                position: "absolute",
-                top: 33,
-                right: 0,
-                width: 220,
-                background: "rgba(2,6,23,0.98)",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  transition: "all 0.2s ease",
+                }}
+              >
+                ⚙ View
+              </button>
 
-                // 🔥 YELLOW BORDER
-                border: "1px solid #facc15",
+              {/* 📦 PANEL */}
+              {showViewPanel && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 33,
+                    right: 0,
+                    width: 220,
+                    background: "rgba(2,6,23,0.98)",
 
-                borderRadius: "2px 0px 2px 2px",
-                padding: 12,
-                zIndex: -1,
+                    // 🔥 YELLOW BORDER
+                    border: "1px solid #facc15",
 
-                // 🔥 STRONG GLOW
-                boxShadow: `
+                    borderRadius: "2px 0px 2px 2px",
+                    padding: 12,
+                    zIndex: -1,
+
+                    // 🔥 STRONG GLOW
+                    boxShadow: `
                   0 6px 10px rgba(0,0,0,0.6),
                   0 0 6px rgba(250,204,21,0.4)
                 `,
-              }}
-            >
-              {/* 🔥 NEW: Signal Engine toggle — placed FIRST for prominence */}
-              <CheckboxItem
-                label="🎯 Signal Engine (BUY/SELL)"
-                checked={enableSignalEngine}
-                onChange={setEnableSignalEngine}
-              />
+                  }}
+                >
+                  {/* 🔥 NEW: Signal Engine toggle — placed FIRST for prominence */}
+                  <CheckboxItem
+                    label="🎯 Signal Engine (BUY/SELL)"
+                    checked={enableSignalEngine}
+                    onChange={setEnableSignalEngine}
+                  />
 
-              {/* Divider */}
-              <div
-                style={{
-                  height: 1,
-                  background: "rgba(250,204,21,0.2)",
-                  margin: "6px 0",
-                }}
-              />
-              {/* ITEM */}
-              <CheckboxItem
-                label="Show Watermark"
-                checked={showWatermark}
-                onChange={setShowWatermark}
-              />
+                  {/* Divider */}
+                  <div
+                    style={{
+                      height: 1,
+                      background: "rgba(250,204,21,0.2)",
+                      margin: "6px 0",
+                    }}
+                  />
+                  {/* ITEM */}
+                  <CheckboxItem
+                    label="Show Watermark"
+                    checked={showWatermark}
+                    onChange={setShowWatermark}
+                  />
 
-              <CheckboxItem
-                label="Fix Tooltip"
-                checked={fixTooltip}
-                onChange={setFixTooltip}
-              />
+                  <CheckboxItem
+                    label="Fix Tooltip"
+                    checked={fixTooltip}
+                    onChange={setFixTooltip}
+                  />
 
-              <CheckboxItem
-                label="Show Tooltip"
-                checked={showTooltip}
-                onChange={setShowTooltip}
-              />
+                  <CheckboxItem
+                    label="Show Tooltip"
+                    checked={showTooltip}
+                    onChange={setShowTooltip}
+                  />
 
-              <CheckboxItem
-                label="No Bands"
-                checked={hideBands}
-                onChange={setHideBands}
-              />
+                  <CheckboxItem
+                    label="No Bands"
+                    checked={hideBands}
+                    onChange={setHideBands}
+                  />
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <PremiumFeature feature="APPLY_CONTROLS" showLocked>
-          <span
-            onClick={() => {
-              setActiveCategory(null);
-              setHighlightStock(null);
-              setSelectedSector?.(null);
-              setMode?.("all");
-            }}
-            style={{
-              marginLeft: 20,
-              //marginRight: 150,
-              cursor: "pointer",
-              fontWeight: 700,
-              padding: "6px 14px",
-              fontSize: 14,
-              borderRadius: 6,
-              background:
-                mode === "all"
-                  ? "linear-gradient(135deg, #6366f1, #a78bfa)" // 🔥 blue → purple
-                  : "rgba(55, 65, 81, 0.6)",
+            <PremiumFeature feature="APPLY_CONTROLS" showLocked>
+              <span
+                onClick={() => {
+                  setActiveCategory(null);
+                  setHighlightStock(null);
+                  setSelectedSector?.(null);
+                  setMode?.("all");
+                }}
+                style={{
+                  marginLeft: 20,
+                  //marginRight: 150,
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  padding: "6px 14px",
+                  fontSize: 14,
+                  borderRadius: 6,
+                  background:
+                    mode === "all"
+                      ? "linear-gradient(135deg, #6366f1, #a78bfa)" // 🔥 blue → purple
+                      : "rgba(55, 65, 81, 0.6)",
 
-              color: mode === "all" ? "#ffffff" : "#cbd5f5",
+                  color: mode === "all" ? "#ffffff" : "#cbd5f5",
 
-              border:
-                mode === "all"
-                  ? "1px solid rgba(167,139,250,0.6)"
-                  : "1px solid rgba(255,255,255,0.08)",
+                  border:
+                    mode === "all"
+                      ? "1px solid rgba(167,139,250,0.6)"
+                      : "1px solid rgba(255,255,255,0.08)",
 
-              boxShadow:
-                mode === "all" ? "0 0 12px rgba(99,102,241,0.5)" : "none",
+                  boxShadow:
+                    mode === "all" ? "0 0 12px rgba(99,102,241,0.5)" : "none",
 
-              transition: "all 0.2s ease",
-            }}
-          >
-            All Stocks
-          </span>
-        </PremiumFeature>
-      </div>
-
-      {/* ─── STYLES (scoped to this component) ─── */}
-      <style jsx>{`
-        .dashboard-logo {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-family: var(--font-display-app);
-          font-size: 22px;
-          font-weight: 600;
-          letter-spacing: -0.5px;
-        }
-
-        .dashboard-logo-mark {
-          display: inline-block;
-          width: 28px;
-          height: 28px;
-        }
-
-        .dashboard-logo-text {
-          letter-spacing: 0.5px;
-        }
-
-        .dashboard-logo-em {
-          color: var(--green);
-          font-style: italic;
-        }
-      `}</style>
+                  transition: "all 0.2s ease",
+                }}
+              >
+                All Stocks
+              </span>
+            </PremiumFeature>
+          </div>
+        )}
+      </DashboardHeader>
     </div>
   );
 }

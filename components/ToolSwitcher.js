@@ -3,10 +3,8 @@
 // components/ToolSwitcher.js
 //
 // 🔀 TOOL SWITCHER — top nav tabs for switching between tools.
-//
-// Pulls tool list from lib/tools.js (single source of truth).
-// Highlights the currently active tool based on URL.
-// Soon tools are shown but disabled.
+// 🎯 All active tabs use brand mint (no per-tool accents).
+// 🎯 Uses --bg-header-strong token for consistent sticky bg.
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,24 +23,8 @@ export default function ToolSwitcher() {
         <Link href="/" className="tool-switcher-logo">
           <span className="tool-switcher-logo-mark">
             <svg viewBox="0 0 28 28" width="24" height="24">
-              <circle
-                cx="14"
-                cy="14"
-                r="12"
-                fill="none"
-                stroke="var(--green)"
-                strokeWidth="1.5"
-                opacity="0.4"
-              />
-              <circle
-                cx="14"
-                cy="14"
-                r="7"
-                fill="none"
-                stroke="var(--green)"
-                strokeWidth="1.5"
-                opacity="0.7"
-              />
+              <circle cx="14" cy="14" r="12" fill="none" stroke="var(--green)" strokeWidth="1.5" opacity="0.4" />
+              <circle cx="14" cy="14" r="7" fill="none" stroke="var(--green)" strokeWidth="1.5" opacity="0.7" />
               <circle cx="14" cy="14" r="2.5" fill="var(--green)" />
             </svg>
           </span>
@@ -71,7 +53,6 @@ export default function ToolSwitcher() {
                 key={tool.id}
                 href={tool.href}
                 className={`tool-switcher-tab ${isActive ? "active" : ""}`}
-                style={isActive ? { borderBottomColor: tool.accent } : {}}
               >
                 {tabContent}
               </Link>
@@ -87,7 +68,7 @@ export default function ToolSwitcher() {
           })}
         </nav>
 
-        {/* ─── RIGHT SIDE (links to learn + status) ─── */}
+        {/* ─── RIGHT SIDE ─── */}
         <div className="tool-switcher-right">
           <Link
             href="/learn"
@@ -109,7 +90,7 @@ export default function ToolSwitcher() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(10, 10, 12, 0.92);
+          background: var(--bg-header-strong, rgba(10, 10, 12, 0.92));
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           border-bottom: 1px solid var(--line);
@@ -181,9 +162,10 @@ export default function ToolSwitcher() {
           color: var(--text);
         }
 
+        /* 🎯 All active tabs use brand mint */
         .tool-switcher-tab.active {
-          color: var(--text);
-          border-bottom-color: var(--green); /* overridden inline per tool */
+          color: var(--green);
+          border-bottom-color: var(--green);
         }
 
         .tool-switcher-tab.disabled {
@@ -201,7 +183,7 @@ export default function ToolSwitcher() {
         .tool-switcher-tab-badge {
           font-size: 9px;
           padding: 1px 5px;
-          background: rgba(100, 116, 139, 0.2);
+          background: rgba(148, 163, 184, 0.15);
           color: var(--text-mute);
           letter-spacing: 1px;
           border-radius: 2px;
@@ -225,9 +207,12 @@ export default function ToolSwitcher() {
           transition: color 0.2s;
         }
 
-        .tool-switcher-link:hover,
-        .tool-switcher-link.active {
+        .tool-switcher-link:hover {
           color: var(--text);
+        }
+
+        .tool-switcher-link.active {
+          color: var(--green);
         }
 
         .tool-switcher-status {

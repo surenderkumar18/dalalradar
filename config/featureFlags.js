@@ -101,3 +101,62 @@ export const PREMIUM_FEATURES = {
   REAL_TIME_DATA: true,
   OI_PRICE_CHART: true,
 };
+
+
+// config/featureFlags.js
+
+export const DEVICE_VISIBILITY = {
+  STOCK_SEARCH: {
+    mobile: false,
+    tablet: false,
+    desktop: true,
+  },
+
+  APPLY_CONTROLS: {
+    mobile: false,
+    tablet: false,
+    desktop: true,
+  },
+
+  BUBBLE_SIZE: {
+    mobile: false,
+    tablet: true,
+    desktop: true,
+  },
+
+  RELATIVE_SIZE: {
+    mobile: false,
+    tablet: true,
+    desktop: true,
+  },
+
+  PAST_DAYS_FILTER: {
+    mobile: true,
+    tablet: true,
+    desktop: true,
+  },
+
+  BUBBLE_POSITION: {
+    mobile: false,
+    tablet: false,
+    desktop: true,
+  },
+
+  VIEW_SETTINGS: {
+    mobile: true,
+    tablet: true,
+    desktop: true,
+  },
+
+  ALL_STOCKS_BUTTON: {
+    mobile: false,
+    tablet: true,
+    desktop: true,
+  },
+
+  SIGNAL_ENGINE: {
+    mobile: false,
+    tablet: true,
+    desktop: true,
+  },
+};

@@ -3,12 +3,11 @@
 // components/ToolDashboard.js
 //
 // 🎛️ TOOL DASHBOARD — the main view at app.dalalradar.com root.
-//
-// Replaces the old redirect('/MarketStructure'). Users now see a proper
-// welcome screen with all their tools as cards.
+// 🎯 Uses --bg-header token for consistent header bg across all pages.
 
 import { TOOLS } from "@/lib/tools";
 import ToolCard from "./ToolCard";
+import DashboardHeader from "@/app/components/DashboardHeader";
 
 export default function ToolDashboard() {
   const liveCount = TOOLS.filter((t) => t.status === "live").length;
@@ -17,47 +16,11 @@ export default function ToolDashboard() {
   return (
     <div className="dashboard">
       {/* ─── HEADER ─── */}
-      <header className="dashboard-header">
-        <div className="dashboard-header-inner">
-          <a href="/" className="dashboard-logo">
-            <span className="dashboard-logo-mark">
-              <svg viewBox="0 0 28 28" width="28" height="28">
-                <circle
-                  cx="14"
-                  cy="14"
-                  r="12"
-                  fill="none"
-                  stroke="var(--green)"
-                  strokeWidth="1.5"
-                  opacity="0.4"
-                />
-                <circle
-                  cx="14"
-                  cy="14"
-                  r="7"
-                  fill="none"
-                  stroke="var(--green)"
-                  strokeWidth="1.5"
-                  opacity="0.7"
-                />
-                <circle cx="14" cy="14" r="2.5" fill="var(--green)" />
-                <line x1="14" y1="2" x2="14" y2="6" stroke="var(--green)" strokeWidth="1" />
-                <line x1="14" y1="22" x2="14" y2="26" stroke="var(--green)" strokeWidth="1" />
-                <line x1="2" y1="14" x2="6" y2="14" stroke="var(--green)" strokeWidth="1" />
-                <line x1="22" y1="14" x2="26" y2="14" stroke="var(--green)" strokeWidth="1" />
-              </svg>
-            </span>
-            <span className="dashboard-logo-text">
-              Dalal<span className="dashboard-logo-em">Radar</span>
-            </span>
-          </a>
-
-          <div className="dashboard-header-status">
-            <span className="dashboard-pulse"></span>
-            <span>LIVE · NSE</span>
-          </div>
+      <nav className="nav">
+        <div className="nav-inner">
+          <DashboardHeader />
         </div>
-      </header>
+      </nav>
 
       {/* ─── MAIN ─── */}
       <main className="dashboard-main">
@@ -115,8 +78,22 @@ export default function ToolDashboard() {
         </div>
       </main>
 
-      {/* ─── STYLES (scoped to this component) ─── */}
       <style jsx>{`
+        .nav {
+          position: sticky;
+          top: 0;
+          z-index: 99;
+          background: rgba(11, 18, 32, 0.85);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 2px solid var(--line);
+        }
+        .nav-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          align-items: center;
+          justify-content: space-between;
+        }
         .dashboard {
           min-height: 100vh;
           background: var(--bg);
@@ -128,7 +105,7 @@ export default function ToolDashboard() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(10, 10, 12, 0.85);
+          background: var(--bg-header, rgba(10, 10, 12, 0.85));
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           border-bottom: 1px solid var(--line);
@@ -151,12 +128,15 @@ export default function ToolDashboard() {
           font-size: 22px;
           font-weight: 600;
           letter-spacing: -0.5px;
+          color: var(--text);
+          text-decoration: none;
         }
 
         .dashboard-logo-mark {
           display: inline-block;
           width: 28px;
           height: 28px;
+          flex-shrink: 0;
         }
 
         .dashboard-logo-text {
@@ -189,8 +169,15 @@ export default function ToolDashboard() {
         }
 
         @keyframes dashboardPulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(0.8); }
+          0%,
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.5;
+            transform: scale(0.8);
+          }
         }
 
         /* ─── MAIN ─── */
@@ -344,8 +331,9 @@ export default function ToolDashboard() {
 
         .tool-card-live:hover {
           background: var(--bg-3);
-          border-color: var(--line-2);
+          border-color: var(--green);
           transform: translateY(-2px);
+          box-shadow: 0 0 24px rgba(0, 255, 162, 0.12);
         }
 
         .tool-card-soon {
@@ -461,6 +449,7 @@ export default function ToolDashboard() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
+          color: var(--green);
         }
 
         .tool-card-arrow {

@@ -119,9 +119,9 @@ function BubbleChartContent() {
   const [rolloverDataMap, setRolloverDataMap] = useState(null);
 
   const [pastDays, setPastDays] = useState(() => {
-    if (typeof window === "undefined") return 90;
+    if (typeof window === "undefined") return 30;
     const saved = localStorage.getItem("bubble_past_days");
-    return saved === "all" ? null : saved ? Number(saved) : 90;
+    return saved === "all" ? null : saved ? Number(saved) : 30;
   });
 
   // 🆕 Mobile detection

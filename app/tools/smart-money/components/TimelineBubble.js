@@ -851,7 +851,13 @@ function TimelineBubble({
                 cy={cy - cy_r}
                 r={r * 1.55}
                 fill={sigStyle.glowColor || sigStyle.fill}
-                opacity={0.18}
+                opacity={
+                  !activeCategoryRef.current
+                    ? 0.18
+                    : payload.stock === activeCategoryRef.current
+                      ? 0.18
+                      : 0.08
+                }
                 style={{ pointerEvents: "none" }}
               />
             )}
@@ -865,7 +871,13 @@ function TimelineBubble({
                 fill="none"
                 stroke={sigStyle.fill}
                 strokeWidth={2}
-                opacity={0.7}
+                opacity={
+                  !activeCategoryRef.current
+                    ? 0.7
+                    : payload.stock === activeCategoryRef.current
+                      ? 0.7
+                      : 0.08
+                }
                 style={{ pointerEvents: "none" }}
               />
             )}
@@ -877,7 +889,13 @@ function TimelineBubble({
               r={r}
               ref={bubbleRefCallback}
               fill={sigStyle.fill}
-              opacity={finalOpacity}
+              opacity={
+                !activeCategoryRef.current
+                  ? finalOpacity
+                  : payload.stock === activeCategoryRef.current
+                    ? finalOpacity
+                    : 0.08
+              }
               data-id={bubbleKey}
               data-x={payload.x}
               data-weak="0"
@@ -906,6 +924,11 @@ function TimelineBubble({
                   pointerEvents: "none",
                   userSelect: "none",
                   textShadow: "0 0 3px rgba(0,0,0,0.9)",
+                  opacity: !activeCategoryRef.current
+                    ? 1
+                    : payload.stock === activeCategoryRef.current
+                      ? 1
+                      : 0.08,
                 }}
               >
                 {sigStyle.icon}
@@ -1348,7 +1371,9 @@ function TimelineBubble({
                       fillOpacity={
                         hideBands ? 0 : isActive ? 1 : isDim ? 0.2 : 0.98
                       }
-                      stroke={isActive ? "#22c55e" : "rgba(255,255,255,0.08)"}
+                      stroke={
+                        isActive ? "var(--green)" : "rgba(255,255,255,0.08)"
+                      }
                       strokeWidth={isActive ? 1.5 : 0}
                       style={{ cursor: "pointer" }}
                       onClick={() => {
@@ -1645,7 +1670,11 @@ function TimelineBubble({
                             fontSize={14}
                             fontWeight={700}
                             fill={
-                              isActive ? "#22c55e" : isDim ? "#555" : "#e5e7eb"
+                              isActive
+                                ? "var(--green)"
+                                : isDim
+                                  ? "#555"
+                                  : "#e5e7eb"
                             }
                             style={{ cursor: "pointer" }}
                           >

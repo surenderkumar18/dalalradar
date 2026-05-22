@@ -1,17 +1,13 @@
 /* app/globals.css
  *
- * 🎯 STEP 1 FINAL — Brand fonts everywhere + #00ffa2 brand green
+ * 🎯 NAVY BLUE THEME — locked in
  *
- * Locked decisions:
- *   ✅ Primary green:  #00ffa2 (your mint green — preserved everywhere)
- *   ✅ Body font:      JetBrains Mono via --font-mono from layout.js
- *   ✅ Display font:   Fraunces via --font-display from layout.js
- *   ✅ Fallback:       Arial (only if Google Fonts haven't loaded yet)
- *
- * Preserves: ALL your existing styles (Tailwind v4, sector tabs, calendar,
- *            checkboxes, bubble hover, scrollbar, sidebar, etc.)
- *
- * Adds: Brand design tokens + new utility classes for new components.
+ * Decisions:
+ *   ✅ Background:      #0b1220 (deep navy)
+ *   ✅ Primary green:   #00ffa2 (mint brand)
+ *   ✅ Data green:      #22c55e (Tailwind, for bubbles)
+ *   ✅ Body font:       JetBrains Mono via --font-mono
+ *   ✅ Display font:    Fraunces via --font-display
  */
 
 @import "tailwindcss";
@@ -25,26 +21,36 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  /* ─── BACKGROUND LAYERS ─── */
-  --bg: #0a0a0c;
-  --bg-2: #111114;
-  --bg-3: #18181b;
+  /* ─── BACKGROUND LAYERS (Navy Blue Theme) ─── */
+  --bg: #0b1220;       /* Deep navy base */
+  --bg-2: #0f172a;     /* Slate-900 - panels */
+  --bg-3: #1e293b;     /* Slate-800 - elevated */
 
   /* ─── LINES & BORDERS ─── */
-  --line: #1f1f23;
-  --line-2: #2a2a30;
+  --line: #1e2a44;     /* Navy border */
+  --line-2: #334155;   /* Slate-700 - hover */
 
   /* ─── TEXT ─── */
   --text: #e8e8ed;
   --text-dim: #94a3b8;
   --text-mute: #64748b;
 
-  /* ─── BRAND ACCENT (#00ffa2 mint green) ─── */
-  --green: #00ffa2;
+  /* ─── BRAND ACCENT (rare, intentional) ─── */
+  --green:        #00ffa2;     /* Mint — logo, CTAs, active states */
   --green-bright: #5effbd;
-  --green-dim: #00cc82;
-  --green-deep: #065f46;
-  --green-glow: rgba(0, 255, 162, 0.35);
+  --green-dim:    #00cc82;
+  --green-deep:   #065f46;
+  --green-glow:   rgba(0, 255, 162, 0.35);
+
+  /* ─── DATA VISUALIZATION (frequent, calmer) ─── */
+  --data-buy:      #22c55e;     /* Bullish bubbles */
+  --data-buy-bg:   rgba(34, 197, 94, 0.22);
+  --data-sell:     #ef4444;
+  --data-warn:     #facc15;
+  --data-accum:    #60a5fa;
+  --data-momentum: #a78bfa;
+  --data-weak:     #f87171;
+  --data-neutral:  #64748b;
 
   /* ─── SIGNAL COLORS ─── */
   --red: #ef4444;
@@ -66,10 +72,12 @@
   --tier-strong-dist:  #ef4444;
   --tier-momentum:     #a78bfa;
 
-  /* ─── BRAND FONTS (locked in) ─── */
-  /* layout.js exposes --font-mono and --font-display from next/font.
-   * If those aren't loaded yet (e.g., during initial paint),
-   * fall back to Arial so nothing looks broken. */
+  /* ─── HEADER / FOOTER OVERLAYS (navy theme) ─── */
+  --bg-header:        rgba(11, 18, 32, 0.85);   /* DashboardHeader */
+  --bg-header-strong: rgba(11, 18, 32, 0.92);   /* ToolSwitcher */
+  --bg-footer:        rgba(11, 18, 32, 0.95);   /* Sector tabs footer */
+
+  /* ─── BRAND FONTS ─── */
   --font-app: var(--font-mono), "JetBrains Mono", Arial, Helvetica, sans-serif;
   --font-display-app: var(--font-display), "Fraunces", Georgia, serif;
 
@@ -100,7 +108,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 📐 BASE LAYER (existing, preserved)
+ * 📐 BASE LAYER
  * ══════════════════════════════════════════════════════════════════════ */
 
 @layer base {
@@ -127,16 +135,13 @@
 
 /* ═══════════════════════════════════════════════════════════════════════
  * 🌐 GLOBAL RESET / BODY
- *
- * 🔥 CHANGED IN STEP 1: Body font now uses JetBrains Mono via --font-app
- *                       Headings (h1-h6) use Fraunces via --font-display-app
  * ══════════════════════════════════════════════════════════════════════ */
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: var(--font-app);  /* 🆕 was: Arial */
+  font-family: var(--font-app);
   font-size: 14px;
 }
 
@@ -146,7 +151,7 @@ body {
 
 body {
   color: var(--foreground);
-  background: #000;
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -162,7 +167,6 @@ a {
   }
 }
 
-/* Brand selection */
 ::selection {
   background: var(--green);
   color: #000;
@@ -170,173 +174,81 @@ a {
 
 /* ═══════════════════════════════════════════════════════════════════════
  * 🅰️ TYPOGRAPHY
- *
- * 🔥 CHANGED IN STEP 1: Headings now use Fraunces (editorial display)
- *                       Tracking + letter-spacing tweaks for the serif
  * ══════════════════════════════════════════════════════════════════════ */
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-display-app);  /* 🆕 was: inherited Arial */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display-app);
   letter-spacing: -0.3px;
 }
 
-h2 {
-  font-size: 20px;
-}
+h2 { font-size: 20px; }
+h2, p { margin-bottom: 20px; }
 
-h2,
-p {
-  margin-bottom: 20px;
-}
-
-ul {
-  margin-left: 2px;
-  padding-left: 18px;
-}
-
+ul { margin-left: 2px; padding-left: 18px; }
 li {
   font-size: 16px;
   list-style-type: none;
   padding-top: 8px;
 }
+li span { font-weight: bold; }
 
-li span {
-  font-weight: bold;
-}
-
-h3 {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-h3 span {
-  color: yellow;
-  margin-bottom: 20px;
-}
+h3 { font-size: 18px; font-weight: bold; }
+h3 span { color: yellow; margin-bottom: 20px; }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 🔗 SIDEBAR + INTERACTIVE (existing, preserved)
+ * 🔗 SIDEBAR + INTERACTIVE (preserved)
  * ══════════════════════════════════════════════════════════════════════ */
 
-.bar-hover:hover {
-  cursor: pointer;
-}
-
-#sidebar ul ul {
-  margin-left: 10px;
-  font-weight: 300;
-}
-
-#sidebar ul li ul li {
-  padding-top: 0px;
-}
-
+.bar-hover:hover { cursor: pointer; }
+#sidebar ul ul { margin-left: 10px; font-weight: 300; }
+#sidebar ul li ul li { padding-top: 0px; }
 #sidebar ul li ul li:hover {
   background-color: #324b75;
   border-radius: 6px;
   transition: background 0.1s ease;
 }
-
 #sidebar ul li ul li ul li:hover {
   background-color: #04255f;
   border-radius: 6px;
   transition: background 0.1s ease;
 }
+#sidebar ul li ul li:hover a { color: #042a63; }
 
-#sidebar ul li ul li:hover a {
-  color: #042a63;
-}
-
-button,
-select,
-svg,
-.clickable {
-  cursor: pointer;
-}
+button, select, svg, .clickable { cursor: pointer; }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 📜 SCROLLBAR (existing, preserved)
+ * 📜 SCROLLBAR
  * ══════════════════════════════════════════════════════════════════════ */
 
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: linear-gradient(var(--line-2), var(--bg-3));
   border-radius: 6px;
 }
-
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(#334155, #1e293b);
-}
+::-webkit-scrollbar-thumb:hover { background: var(--line-2); }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 📊 RECHARTS / SVG FOCUS RESET (existing, preserved)
+ * 📊 RECHARTS / SVG FOCUS RESET
  * ══════════════════════════════════════════════════════════════════════ */
 
-svg:focus,
-svg:focus-visible {
-  outline: none !important;
-}
-
-.recharts-wrapper:focus,
-.recharts-surface:focus {
-  outline: none !important;
-}
-
-.recharts-surface {
-  outline: none !important;
-}
-
-.recharts-surface:focus,
-.recharts-wrapper:focus {
-  outline: none !important;
-}
+svg:focus, svg:focus-visible,
+.recharts-wrapper:focus, .recharts-surface:focus,
+.recharts-surface { outline: none !important; }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 🎯 BUBBLE DATA-ACTIVE SELECTORS (existing, preserved)
+ * 🎯 BUBBLE DATA-ACTIVE SELECTORS
  * ══════════════════════════════════════════════════════════════════════ */
 
-[data-active=""] circle[data-recent="1"] {
-  opacity: 1 !important;
-}
-
-[data-active=""] circle:not([data-recent="1"]) {
-  opacity: 0.1 !important;
-}
-
-[data-active]:not([data-active=""]) circle {
-  opacity: 0.05 !important;
-}
-
-[data-active]:not([data-active=""]) circle[data-sector] {
-  opacity: 0.05 !important;
-}
-
-[data-active]:not([data-active=""]) circle[data-sector][data-sector] {
-  opacity: 0.05;
-}
-
-[data-active]:not([data-active=""]) circle[data-sector="TECH"] {
-  opacity: 1 !important;
-}
+[data-active=""] circle[data-recent="1"] { opacity: 1 !important; }
+[data-active=""] circle:not([data-recent="1"]) { opacity: 0.1 !important; }
+[data-active]:not([data-active=""]) circle { opacity: 0.05 !important; }
+[data-active]:not([data-active=""]) circle[data-sector] { opacity: 0.05 !important; }
+[data-active]:not([data-active=""]) circle[data-sector][data-sector] { opacity: 0.05; }
+[data-active]:not([data-active=""]) circle[data-sector="TECH"] { opacity: 1 !important; }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * ✅ CUSTOM CHECKBOX (existing, preserved)
+ * ✅ CUSTOM CHECKBOX
  * ══════════════════════════════════════════════════════════════════════ */
 
 @layer components {
@@ -351,28 +263,26 @@ svg:focus-visible {
     color: #cbd5f5;
   }
 
-  .custom-checkbox input {
-    display: none;
-  }
+  .custom-checkbox input { display: none; }
 
   .custom-checkbox .checkmark {
     width: 18px;
     height: 18px;
     border-radius: 4px;
-    background: #111827;
-    border: 1px solid #374151;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
     position: relative;
     transition: all 0.2s ease;
   }
 
   .custom-checkbox:hover .checkmark {
-    border-color: #00ffa2;
+    border-color: var(--green);
     box-shadow: 0 0 6px rgba(0, 255, 162, 0.3);
   }
 
   .custom-checkbox input:checked + .checkmark {
-    background: #00ffa2;
-    border-color: #00ffa2;
+    background: var(--green);
+    border-color: var(--green);
   }
 
   .custom-checkbox .checkmark::after {
@@ -392,35 +302,30 @@ svg:focus-visible {
     transform: rotate(45deg) scale(1);
   }
 
-  .custom-checkbox .label-text {
-    transition: color 0.2s ease;
-  }
-
-  .custom-checkbox input:checked ~ .label-text {
-    color: #00ffa2;
-  }
+  .custom-checkbox .label-text { transition: color 0.2s ease; }
+  .custom-checkbox input:checked ~ .label-text { color: var(--green); }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 🎯 SECTOR TABS (existing, preserved)
+ * 🎯 SECTOR TABS
  * ══════════════════════════════════════════════════════════════════════ */
 
 @layer components {
   .sector-tab {
-    color: #94a3b8;
+    color: var(--text-dim);
     font-weight: 700;
     position: relative;
     transition: all 0.2s ease;
   }
 
   .sector-tab.active {
-    color: #00ffa2;
+    color: #0a0a0c;
     font-weight: 800;
-    background-color: #334155;
+    background-color: var(--green);
   }
 
   .sector-tab:hover {
-    color: #00ffa2;
+    color: var(--green);
     transform: translateY(-1px);
   }
 
@@ -431,63 +336,52 @@ svg:focus-visible {
     bottom: -3px;
     width: 0%;
     height: 2px;
-    background: #3896fa;
+    background: var(--green);
     transition: width 0.2s ease;
   }
 
-  .sector-tab:hover::after {
-    width: 100%;
-  }
+  .sector-tab:hover::after { width: 100%; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 🔘 ALL STOCKS BUTTON (existing, preserved)
+ * 🔘 ALL STOCKS BUTTON
  * ══════════════════════════════════════════════════════════════════════ */
 
 @layer components {
   .allstocks-btn {
-    color: #94a3b8;
-    background: #374151;
+    color: var(--text-dim);
+    background: var(--bg-3);
     transition: all 0.25s ease;
   }
 
   .allstocks-btn.active {
-    color: #00ffa2;
-    background: #065f46;
+    color: #0a0a0c;
+    background: var(--green);
   }
 
   .allstocks-btn:hover {
-    background: linear-gradient(90deg, #065f46, #00ffa2);
-    color: #022c22;
-    box-shadow: 0 0 10px rgba(0, 255, 162, 0.4);
+    background: var(--green);
+    color: #0a0a0c;
+    box-shadow: 0 0 10px var(--green-glow);
     transform: scale(1.05);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 🏷️ AXIS LABELS (existing, preserved)
+ * 🏷️ AXIS LABELS
  * ══════════════════════════════════════════════════════════════════════ */
 
 @layer components {
-  .axis-label-group {
-    cursor: pointer;
-  }
-
-  .axis-label-bg {
-    fill: transparent;
-    transition: all 0.2s ease;
-  }
-
+  .axis-label-group { cursor: pointer; }
+  .axis-label-bg { fill: transparent; transition: all 0.2s ease; }
   .axis-label-text {
-    fill: #94a3b8;
+    fill: var(--text-dim);
     font-size: 7px;
     transition: all 0.2s ease;
   }
-
   .axis-label-group:hover .axis-label-bg {
-    fill: rgba(99, 102, 241, 0.25);
+    fill: rgba(0, 255, 162, 0.15);
   }
-
   .axis-label-group:hover .axis-label-text {
     fill: #ffffff;
     font-size: 12px;
@@ -495,58 +389,43 @@ svg:focus-visible {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 📅 REACT DAY PICKER + 🫧 BUBBLE + 🔍 SEARCH (existing, preserved)
+ * 📅 REACT DAY PICKER + 🫧 BUBBLE + 🔍 SEARCH
  * ══════════════════════════════════════════════════════════════════════ */
 
 @layer components {
   .rdp-caption_label {
     font-size: 18px;
     font-weight: 700;
-    color: #e2e8f0;
+    color: var(--text);
   }
 
   .rdp-button_previous,
   .rdp-button_next {
-    background: #1e293b;
+    background: var(--bg-3);
     border-radius: 8px;
     padding: 6px;
     transition: 0.2s;
   }
 
   .rdp-button_previous:hover,
-  .rdp-button_next:hover {
-    background: #334155;
-  }
+  .rdp-button_next:hover { background: var(--line-2); }
 
   .rdp-button_previous svg,
   .rdp-button_next svg {
     width: 18px;
     height: 18px;
-    stroke: #00ffa2;
+    stroke: var(--green);
   }
 
-  .rdp-day {
-    border-radius: 8px;
-    transition: 0.2s;
-  }
-
-  .rdp-day:hover {
-    background: #1e293b;
-  }
-
+  .rdp-day { border-radius: 8px; transition: 0.2s; }
+  .rdp-day:hover { background: var(--bg-3); }
   .rdp-day_selected {
     background: #2563eb !important;
     color: white !important;
     font-weight: bold;
   }
-
-  .rdp-day_today {
-    border: 1px solid #00ffa2;
-  }
-
-  .rdp-day:focus {
-    outline: none;
-  }
+  .rdp-day_today { border: 1px solid var(--green); }
+  .rdp-day:focus { outline: none; }
 
   .rdp {
     --rdp-background-color: transparent;
@@ -555,39 +434,32 @@ svg:focus-visible {
   }
 
   .rdp-dropdown {
-    background: #1e293b !important;
-    color: #e2e8f0 !important;
-    border: 1px solid #334155;
+    background: var(--bg-3) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--line-2);
     border-radius: 6px;
     padding: 4px 8px;
   }
 
   .rdp-dropdown option {
-    background: #1e293b;
-    color: #e2e8f0;
+    background: var(--bg-3);
+    color: var(--text);
   }
 
   .rdp-dropdown:focus {
     outline: none;
-    border-color: #00ffa2;
+    border-color: var(--green);
   }
 
   /* Bubble hover */
-  .bubble {
-    transition: none;
-  }
-
+  .bubble { transition: none; }
   .bubble:hover {
     stroke: #ffffff;
     stroke-width: 2.5;
-    filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 14px #38bdf8);
+    filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 14px var(--blue));
   }
 
   /* Search wrapper */
-  .search-wrapper {
-    width: 460px;
-  }
-
   .search-wrapper > div > div:last-child {
     width: 100% !important;
     left: 0 !important;
@@ -595,38 +467,18 @@ svg:focus-visible {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
- * 🆕 NEW BRAND UTILITIES (Step 1)
- * Use these in new components.
+ * 🆕 BRAND UTILITIES
  * ══════════════════════════════════════════════════════════════════════ */
 
 @layer components {
-  /* Font helpers */
-  .font-display {
-    font-family: var(--font-display-app);
-  }
+  .font-display { font-family: var(--font-display-app); }
+  .font-app { font-family: var(--font-app); }
 
-  .font-app {
-    font-family: var(--font-app);
-  }
+  .text-brand { color: var(--green); }
+  .text-brand-dim { color: var(--green-dim); }
+  .text-signal-sell { color: var(--red); }
+  .text-signal-warn { color: var(--gold); }
 
-  /* Brand text colors */
-  .text-brand {
-    color: var(--green);
-  }
-
-  .text-brand-dim {
-    color: var(--green-dim);
-  }
-
-  .text-signal-sell {
-    color: var(--red);
-  }
-
-  .text-signal-warn {
-    color: var(--gold);
-  }
-
-  /* Brand buttons */
   .btn-brand {
     background: var(--green);
     color: #000;
