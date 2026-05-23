@@ -59,6 +59,14 @@ export default function StockSearch({
     }
   };
 
+  // 🎨 Border color: focused (mint) > hovered (light) > default
+  // No transform/translateY — that was causing the jitter
+  const borderColor = isFocused
+    ? "#00ffa2"
+    : isHovered
+      ? "#475569"
+      : "#334155";
+
   return (
     <div style={{ position: "relative", marginLeft: 14 }}>
       {/* INPUT WRAPPER */}
@@ -72,21 +80,11 @@ export default function StockSearch({
           borderRadius: 4,
           padding: "6px 12px",
           width: "100%",
-          transition: "all .2s ease",
-          border: `1px solid ${
-            isFocused
-              ? "#475569" // purple when typing
-              : isHovered
-                ? "#475569" // lighter border on hover
-                : "#334155"
-          }`,
-          boxShadow:
-            isFocused || isHovered
-              ? "#475569"
-              : isHovered
-                ? "0 2px 2px rgba(0,0,0,.45)"
-                : "0 1px 2px rgba(0,0,0,.3)",
-          transform: isHovered ? "translateY(-1px)" : "translateY(0)",
+          border: `1px solid ${borderColor}`,
+          boxShadow: isFocused
+            ? "0 0 0 2px rgba(0, 255, 162, 0.15)"
+            : "0 1px 2px rgba(0,0,0,.3)",
+          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
         }}
       >
         {/* ICON */}
@@ -99,7 +97,7 @@ export default function StockSearch({
           strokeWidth="2"
           style={{
             marginRight: 8,
-            transition: "all .2s ease",
+            transition: "stroke 0.2s ease",
           }}
         >
           <circle cx="11" cy="11" r="7" />
@@ -111,7 +109,7 @@ export default function StockSearch({
           value={searchQuery}
           onChange={(e) => {
             const val = e.target.value;
-            setSearchQuery(val); // instant
+            setSearchQuery(val);
           }}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -144,7 +142,6 @@ export default function StockSearch({
             borderRadius: "0px 0px 4px 4px",
             width: 380,
             zIndex: 50,
-            transform: isHovered ? "translateY(-1px)" : "translateY(0)",
           }}
         >
           {results.map((r, i) => (

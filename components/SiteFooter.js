@@ -57,19 +57,19 @@ export default function SiteFooter() {
               </li>
 
               <li>
-                <a href="/methodology">
+                <a href="https://dalalradar.com/methodology.html">
                   Methodology
                 </a>
               </li>
 
               <li>
-                <a href="/pricing">
+                <a href="https://dalalradar.com/pricing.html">
                   Pricing
                 </a>
               </li>
 
               <li>
-                <a href="/faq">
+                <a href="https://dalalradar.com/faq.html">
                   FAQ
                 </a>
               </li>
@@ -82,13 +82,13 @@ export default function SiteFooter() {
 
             <ul>
               <li>
-                <a href="/about">
+                <a href="https://dalalradar.com/about.html">
                   About
                 </a>
               </li>
 
               <li>
-                <a href="/contact">
+                <a href="https://dalalradar.com/contact.html">
                   Contact
                 </a>
               </li>
@@ -101,25 +101,25 @@ export default function SiteFooter() {
 
             <ul>
               <li>
-                <a href="/privacy">
+                <a href="https://dalalradar.com/privacy.html">
                   Privacy
                 </a>
               </li>
 
               <li>
-                <a href="/terms">
+                <a href="https://dalalradar.com/terms.html">
                   Terms
                 </a>
               </li>
 
               <li>
-                <a href="/disclaimer">
+                <a href="https://dalalradar.com/disclaimer.html">
                   Disclaimer
                 </a>
               </li>
 
               <li>
-                <a href="/refund">
+                <a href="https://dalalradar.com/refund.html">
                   Refund Policy
                 </a>
               </li>

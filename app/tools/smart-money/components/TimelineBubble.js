@@ -38,11 +38,12 @@ const CURSOR_STYLE = Object.freeze({
 });
 
 // 🔥 HOVER HIT AREA — minimum hit radius regardless of bubble size.
-// Even tiny gray bubbles get a 14px hit zone so they're easy to hover.
-const MIN_HIT_RADIUS = 14;
-// Multiplier applied to visual radius for hit zone (gives generous tolerance
-// for medium bubbles too). Final hit radius = max(MIN_HIT_RADIUS, r * MULT).
-const HIT_RADIUS_MULT = 1.6;
+// Tiny bubbles get a generous 18px hit zone so they're easy to hover.
+const MIN_HIT_RADIUS = 18;
+// Multiplier applied to visual radius for hit zone.
+// 🔧 TUNED: 1.4 = forgiving without being absurdly large.
+// Combined with overlap-tracking logic below, dense clusters still work.
+const HIT_RADIUS_MULT = 1.4;
 
 // =====================================================================
 // 🔥 SMART ENTRY COLOR + OPACITY MATRIX
@@ -185,6 +186,12 @@ function handleBubbleEnter(e) {
   const ctx = bubbleContextLookup(overlayEl);
   if (!ctx) return;
 
+  // 🔧 OVERLAP FIX: bail early if we're already highlighting this same bubble.
+  // We re-fire this on every onMouseMove (see onHitMove below) to track which
+  // of multiple overlapping bubbles is under the cursor. Without this guard
+  // we'd thrash the DOM on every pixel of mouse movement over the same bubble.
+  if (ctx.hoveredKeyRef.current === key) return;
+
   const date = String(visibleEl.getAttribute("data-x"));
 
   // === Date label highlight ===
@@ -247,6 +254,32 @@ function handleBubbleLeave(e) {
   const visibleEl = findVisibleBubble(overlayEl);
   const ctx = bubbleContextLookup(overlayEl);
   if (!ctx) return;
+
+  // 🔧 OVERLAP FIX: only reset if we're leaving the bubble we were tracking.
+  // When bubbles overlap, the mouse can fire:
+  //   1. Enter on A    → hoveredKey = "A"
+  //   2. Enter on B    → hoveredKey = "B"
+  //   3. Leave on A    ← stale! mouse is still over B
+  // Without this guard, step 3 would erase B's highlight even though the
+  // cursor is still over B.
+  if (visibleEl) {
+    const leavingKey = visibleEl.getAttribute("data-id");
+    if (leavingKey && ctx.hoveredKeyRef.current !== leavingKey) {
+      return;
+    }
+  }
+
+  // Also: if mouse is moving directly to ANOTHER bubble's hit-area,
+  // skip the reset — the next Enter will swap the highlight smoothly.
+  const related = e.relatedTarget;
+  if (
+    related &&
+    related.nodeType === 1 &&
+    related.getAttribute &&
+    related.getAttribute("data-target")
+  ) {
+    return;
+  }
 
   // === Reset date label highlight ===
   const prev = ctx.lastHighlightedRef.current;
@@ -833,8 +866,20 @@ function TimelineBubble({
         const onHitEnter = (e) => {
           handleBubbleEnter(e);
           if (props.onMouseEnter) props.onMouseEnter(e);
+          // 🔧 TOOLTIP ACTIVATION FIX:
+          // Recharts ScatterChart's Tooltip needs a `mousemove` event to
+          // compute the active data point — `mouseenter` alone is not enough.
+          // When the cursor moves directly onto a bubble from outside the
+          // chart (e.g. from a chart edge), no `mousemove` fires until the
+          // user wiggles. Synthesize one by also calling onMouseMove here.
+          if (props.onMouseMove) props.onMouseMove(e);
         };
         const onHitMove = (e) => {
+          // 🔧 OVERLAP FIX: re-fire highlight on every move so when mouse
+          // drifts from one overlapping bubble's hit-area into another's,
+          // the highlight tracks the actual current target. handleBubbleEnter
+          // early-returns if it's the same bubble, so this is cheap.
+          handleBubbleEnter(e);
           if (props.onMouseMove) props.onMouseMove(e);
         };
         const onHitLeave = (e) => {
@@ -1084,8 +1129,16 @@ function TimelineBubble({
           handleBubbleEnter(e);
           // Recharts attaches its own handler via props.onMouseEnter
           if (props.onMouseEnter) props.onMouseEnter(e);
+          // 🔧 TOOLTIP ACTIVATION FIX: Recharts needs a mousemove to compute
+          // the active data point. Synthesize one on every Enter so tooltips
+          // appear immediately, even when entering a bubble from outside the
+          // chart's plotting region.
+          if (props.onMouseMove) props.onMouseMove(e);
         };
         const onHitMove = (e) => {
+          // 🔧 OVERLAP FIX: same as signal bubbles — track current target
+          // every frame so overlapping bubbles each get a chance.
+          handleBubbleEnter(e);
           if (props.onMouseMove) props.onMouseMove(e);
         };
         const onHitLeave = (e) => {
