@@ -348,13 +348,13 @@ export default function Header({
                     checked={showWatermark}
                     onChange={setShowWatermark}
                   />
-
-                  <CheckboxItem
-                    label="Fix Tooltip"
-                    checked={fixTooltip}
-                    onChange={setFixTooltip}
-                  />
-
+                   {/*
+                    <CheckboxItem
+                      label="Fix Tooltip"
+                      checked={fixTooltip}
+                      onChange={setFixTooltip}
+                    />
+                  */}
                   <CheckboxItem
                     label="Show Tooltip"
                     checked={showTooltip}

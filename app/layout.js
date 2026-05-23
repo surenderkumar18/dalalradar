@@ -1,14 +1,21 @@
 // app/layout.js
 //
-// 🎯 STEP 1 OF REFACTOR — Root layout
-// Changes:
+// 🎯 ROOT LAYOUT
+// Changes from prior version:
 //   ✅ Fixed metadata (was "Create Next App" — embarrassing in production)
 //   ✅ Added OpenGraph + Twitter cards (for social sharing)
 //   ✅ Switched to JetBrains Mono + Fraunces (matches landing page brand)
 //   ✅ Added theme color + favicon refs
 //   ✅ Set Indian locale
+//   ✅ Wired GA4 + Microsoft Clarity + Vercel Analytics
+//
+// 🆕 SEO UPDATE (May 2026):
+//   ✅ Blocks search engines from indexing app.dalalradar.com
+//      → app is a TOOL, not content. SEO traffic should go to dalalradar.com
+//   ✅ Removed `keywords` meta (Google ignores since 2009)
 //
 // This file affects EVERY page in your app.
+
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 
@@ -35,11 +42,12 @@ const display = Fraunces({
 });
 
 // ─── METADATA ─────────────────────────────────────────────────────────
-// This shows up in:
+// Shows up in:
 //   - Browser tab title
-//   - Google search results
-//   - Social media previews (when sharing app.dalalradar.com)
-//   - WhatsApp/Telegram link previews
+//   - Social media previews (WhatsApp, Twitter, LinkedIn shares)
+//   - NOT Google search results — we explicitly block indexing below.
+//     The app is a tool. All discovery traffic should land on the
+//     marketing site at dalalradar.com.
 export const metadata = {
   metadataBase: new URL("https://app.dalalradar.com"),
   title: {
@@ -47,16 +55,7 @@ export const metadata = {
     template: "%s · DalalRadar",
   },
   description:
-    "Track institutional money flow on Dalal Street. Real-time signal engine, sector rotation tracker, and whale alerts for Indian F&O markets.",
-  keywords: [
-    "smart money india",
-    "dalal street tracker",
-    "f&o analysis",
-    "sector rotation",
-    "money flow",
-    "institutional trading",
-    "indian stock market tools",
-  ],
+    "DalalRadar tool dashboard. Track institutional money flow across 208 F&O stocks on Dalal Street.",
   authors: [{ name: "DalalRadar" }],
   creator: "DalalRadar",
   publisher: "DalalRadar",
@@ -68,6 +67,25 @@ export const metadata = {
     address: false,
     telephone: false,
   },
+
+  // 🔒 BLOCK SEARCH ENGINES FROM INDEXING THE APP
+  // The app is a tool, not marketing content. Keep all SEO traffic on
+  // dalalradar.com (landing), then click-through to launch the app.
+  // This prevents tool URLs and query-param variants from polluting search.
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
+
+  // OG/Twitter STAY — these are for link sharing (WhatsApp/Twitter etc),
+  // which is independent of search indexing. When a user shares an app
+  // URL, they should still see a branded preview card.
   openGraph: {
     title: "DalalRadar — Smart Money Tools",
     description:
@@ -76,21 +94,22 @@ export const metadata = {
     siteName: "DalalRadar",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://dalalradar.com/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "DalalRadar — Smart Money Radar for Indian F&O",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DalalRadar",
+    title: "DalalRadar — Smart Money Tools",
     description: "Smart money tracking for Dalal Street.",
     creator: "@DalalRadarIN",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-    },
+    site: "@DalalRadarIN",
+    images: ["https://dalalradar.com/og-image.png"],
   },
 };
 
@@ -109,41 +128,39 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-IN" suppressHydrationWarning>
       <body
-          suppressHydrationWarning
-          className={`${mono.variable} ${display.variable} antialiased`}
-        >
-          {children}
+        suppressHydrationWarning
+        className={`${mono.variable} ${display.variable} antialiased`}
+      >
+        {children}
 
-          {/* Google Analytics */}
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-FFMMK4L8PP"
-            strategy="afterInteractive"
-          />
+        {/* Google Analytics 4 */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-FFMMK4L8PP"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FFMMK4L8PP', { anonymize_ip: true });
+          `}
+        </Script>
 
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
+        {/* Microsoft Clarity — session recordings + heatmaps */}
+        <Script id="microsoft-clarity" strategy="afterInteractive">
+          {`
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "wvkpr09c1o");
+          `}
+        </Script>
 
-              gtag('config', 'G-FFMMK4L8PP');
-            `}
-          </Script>
-
-          {/* Microsoft Clarity */}
-          <Script id="microsoft-clarity" strategy="afterInteractive">
-            {`
-              (function(c,l,a,r,i,t,y){
-                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-              })(window, document, "clarity", "script", "wvkpr09c1o");
-            `}
-          </Script>
-
-          {/* Vercel Analytics */}
-          <Analytics />
-        </body>
+        {/* Vercel Analytics */}
+        <Analytics />
+      </body>
     </html>
   );
 }
