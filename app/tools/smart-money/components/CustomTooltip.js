@@ -1043,11 +1043,12 @@ const CustomTooltip = React.memo(function CustomTooltip({
               </span>
             </div>
           )}
+          {/**
           {isStock && (
             <div style={{ fontSize: 16 }}>
               OI Signal: <b style={{ color: "#a78bfa" }}>{d.oiAnalysis}</b>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 

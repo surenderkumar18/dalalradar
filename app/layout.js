@@ -9,6 +9,8 @@
 //   ✅ Set Indian locale
 //
 // This file affects EVERY page in your app.
+import { Analytics } from "@vercel/analytics/react";
+import Script from "next/script";
 
 import "./globals.css";
 import { JetBrains_Mono, Fraunces } from "next/font/google";
@@ -107,11 +109,30 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-IN" suppressHydrationWarning>
       <body
-        suppressHydrationWarning
-        className={`${mono.variable} ${display.variable} antialiased`}
-      >
-        {children}
-      </body>
+          suppressHydrationWarning
+          className={`${mono.variable} ${display.variable} antialiased`}
+        >
+          {children}
+
+          {/* Google Analytics */}
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-FFMMK4L8PP"
+            strategy="afterInteractive"
+          />
+
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              gtag('config', 'G-FFMMK4L8PP');
+            `}
+          </Script>
+
+          {/* Vercel Analytics */}
+          <Analytics />
+        </body>
     </html>
   );
 }
