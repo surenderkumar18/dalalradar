@@ -10,9 +10,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-
+import SiteFooter from "@/components/SiteFooter";
 import DashboardHeader from "@/app/components/DashboardHeader";
-import Sidebar from "../../../components/Sidebar";
 import { detectSectorLeadership } from "./utils/detectSectorLeadership";
 import { buildSectorTimeline } from "./utils/buildSectorTimeline";
 import { buildSectorFlow } from "./utils/buildSectorFlow";
@@ -109,6 +108,8 @@ export default function Page() {
             <SectorMoneyRiver data={flow} events={events} timeline={timeline} />
           )}
         </section>
+        
+      <SiteFooter />
       </main>
     </div>
   );

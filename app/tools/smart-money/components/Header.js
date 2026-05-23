@@ -280,7 +280,7 @@ export default function Header({
                 onClick={() => setShowViewPanel((v) => !v)}
                 style={{
                   padding: "6px 12px",
-                  borderRadius: showViewPanel ? "4px 4px 0px 0px" : 6,
+                  borderRadius: showViewPanel ? "4px 4px 0px 0px" : 4,
                   background: showViewPanel
                     ? "rgba(2,6,23,0.98)"
                     : "rgba(30,41,59,0.9)",

@@ -102,13 +102,14 @@ function LockedOverlay({ children }) {
           style={{
             background: "var(--bg-2, #111114)",
             border: "1px solid var(--gold, #facc15)",
-            padding: "6px 12px",
+            padding: "9px 12px",
             fontFamily: "var(--font-app, monospace)",
             fontSize: 11,
             fontWeight: 600,
             letterSpacing: 1.5,
             textTransform: "uppercase",
             color: "var(--gold, #facc15)",
+            borderRadius: 4,
           }}
         >
           🔒 Premium

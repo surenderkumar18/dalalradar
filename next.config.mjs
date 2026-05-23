@@ -7,6 +7,7 @@
 //   2. Strips console.* statements from production builds
 //   3. Adds security headers (XSS, clickjacking protection)
 //   4. Removes "Powered by Next.js" header
+//   5. 🆕 Redirects dev-only tools to 404 on production
 //
 // This is the FAST PROTECTION layer — no extra packages needed.
 // For full obfuscation, add webpack-obfuscator later (see OBFUSCATION_GUIDE.md).
@@ -29,6 +30,38 @@ const nextConfig = {
             exclude: ["error", "warn"],
           }
         : false,
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // 🚫 DEV-ONLY ROUTES — block on production (Vercel)
+  // ─────────────────────────────────────────────────────────────────
+  // Pages listed here ONLY work in `npm run dev`.
+  // On production they return 404 via redirect.
+  //
+  // Add more dev-only routes here as you build internal tools:
+  //   { source: "/tools/foo", destination: "/404", permanent: false },
+  // ─────────────────────────────────────────────────────────────────
+  async redirects() {
+    // No redirects in dev — everything stays accessible
+    if (process.env.NODE_ENV !== "production") {
+      return [];
+    }
+
+    return [
+      // 🚫 Internal filters tool — never expose on live site
+      {
+        source: "/tools/filters",
+        destination: "/404",
+        permanent: false, // false = 307 temporary, lets us re-enable later
+      },
+      // 🚫 Catch any sub-routes too (e.g., /tools/filters/foo)
+      {
+        source: "/tools/filters/:path*",
+        destination: "/404",
+        permanent: false,
+      },
+      // Add more dev-tool blocks here as needed
+    ];
   },
 
   // 🔒 Security headers — prevent common attacks
@@ -75,6 +108,16 @@ const nextConfig = {
           {
             key: "X-Robots-Tag",
             value: "noindex, nofollow",
+          },
+        ],
+      },
+      // 🔒 No-index for dev tools (extra safety, even if redirect fails)
+      {
+        source: "/tools/filters/:path*",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow, nosnippet, noarchive",
           },
         ],
       },

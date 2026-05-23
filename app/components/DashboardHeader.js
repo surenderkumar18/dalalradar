@@ -54,6 +54,7 @@ export default function DashboardHeader({ children }) {
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           padding: 14px 24px;
+          border-bottom: 1px solid var(--line);
         }
 
         /* ─── LOGO ─── */

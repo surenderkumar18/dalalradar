@@ -21,6 +21,7 @@ import React, {
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
+import SiteFooter from "@/components/SiteFooter";
 import { mergeOiIntoRollover } from "@/app/utils/mergeOiIntoRollover";
 import { buildSectorTimeline } from "@/app/utils/buildSectorTimeline";
 import { loadMarketCaps } from "@/app/utils/loadMarketCaps";
@@ -820,6 +821,7 @@ function BubbleChartContent() {
           </main>
         </div>
       </div>
+      <SiteFooter />
     </div>
   );
 }

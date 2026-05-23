@@ -56,14 +56,14 @@ export default function CustomDropdown({
         onClick={() => setOpen((v) => !v)}
         style={{
           width,
-          padding: "7px 12px",
+          padding: "6px 12px",
           borderRadius: 4,
           border: open
             ? "1px solid rgba(250,204,21,0.6)"
             : "1px solid rgba(255,255,255,0.10)",
           background: open
             ? "rgba(15,23,42,0.98)"
-            : "linear-gradient(180deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))",
+            : "#131c2e",
           color: "#f8fafc",
           fontSize: 14,
           fontWeight: 600,
@@ -72,7 +72,7 @@ export default function CustomDropdown({
           alignItems: "center",
           justifyContent: "space-between",
           boxShadow: open
-            ? "0 0 12px rgba(250,204,21,0.18)"
+            ? "0 0 6px rgba(250,204,21,0.18)"
             : "inset 0 1px 0 rgba(255,255,255,0.04)",
           transition: "all 0.18s ease",
         }}

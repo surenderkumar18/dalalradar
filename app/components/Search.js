@@ -69,24 +69,23 @@ export default function StockSearch({
           display: "flex",
           alignItems: "center",
           background: "#020617",
-          borderRadius: 10,
-          padding: "8px 12px",
+          borderRadius: 4,
+          padding: "6px 12px",
           width: "100%",
-          height: 52,
           transition: "all .2s ease",
-          border: `2px solid ${
+          border: `1px solid ${
             isFocused
-              ? "#7c3aed" // purple when typing
+              ? "#475569" // purple when typing
               : isHovered
                 ? "#475569" // lighter border on hover
                 : "#334155"
           }`,
           boxShadow:
             isFocused || isHovered
-              ? "0 0 0 2px rgba(124,58,237,.35), 0 0 18px rgba(124,58,237,.4)"
+              ? "#475569"
               : isHovered
-                ? "0 4px 14px rgba(0,0,0,.45)"
-                : "0 2px 8px rgba(0,0,0,.3)",
+                ? "0 2px 2px rgba(0,0,0,.45)"
+                : "0 1px 2px rgba(0,0,0,.3)",
           transform: isHovered ? "translateY(-1px)" : "translateY(0)",
         }}
       >
@@ -96,7 +95,7 @@ export default function StockSearch({
           height="24"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={isFocused ? "#c084fc" : "#ffffff"}
+          stroke={isFocused ? "#00ffa2" : "#ffffff"}
           strokeWidth="2"
           style={{
             marginRight: 8,
@@ -135,18 +134,16 @@ export default function StockSearch({
         <div
           style={{
             position: "absolute",
-            top: 50,
-            left: 32,
+            top: 39,
+            left: 0,
             background: "#020617",
             borderBottom: "1px solid #334155",
             borderLeft: "1px solid #334155",
             borderRight: "1px solid #334155",
             borderTop: "0px solid #334155",
-            borderRadius: "0px 0px 10px 10px",
+            borderRadius: "0px 0px 4px 4px",
             width: 380,
             zIndex: 50,
-            boxShadow:
-              "0 4px 0 2px rgba(124,58,237,.35), 0 0 18px rgba(124,58,237,.4)",
             transform: isHovered ? "translateY(-1px)" : "translateY(0)",
           }}
         >
