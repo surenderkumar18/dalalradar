@@ -1,0 +1,15 @@
+# robots.txt for dalalradar.com (landing site)
+# Allow search engines to crawl all marketing content.
+# Block sensitive/legal pages from search snippets (still allow crawl for link discovery).
+
+User-agent: *
+Allow: /
+
+# Block common admin/dev paths if you ever add them
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dev/
+Disallow: /_internal/
+
+# Sitemap location
+Sitemap: https://dalalradar.com/sitemap.xml
