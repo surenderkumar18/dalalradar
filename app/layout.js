@@ -8,6 +8,7 @@
 //   ✅ Added theme color + favicon refs
 //   ✅ Set Indian locale
 //   ✅ Wired GA4 + Microsoft Clarity + Vercel Analytics
+//      → GA4 and Clarity only fire in production (NEXT_PUBLIC_VERCEL_ENV)
 //
 // 🆕 SEO UPDATE (May 2026):
 //   ✅ Blocks search engines from indexing app.dalalradar.com
@@ -116,11 +117,11 @@ export const metadata = {
 // ─── VIEWPORT ─────────────────────────────────────────────────────────
 // Separate export in Next.js 14+
 export const viewport = {
-  themeColor: "#0a0a0c",
+  themeColor: "#0b1220",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false,
+  userScalable: true,
 };
 
 // ─── ROOT LAYOUT ──────────────────────────────────────────────────────
@@ -134,29 +135,36 @@ export default function RootLayout({ children }) {
         {children}
 
         {/* Google Analytics 4 */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-FFMMK4L8PP"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-FFMMK4L8PP', { anonymize_ip: true });
-          `}
-        </Script>
+        {/* Google Analytics 4 — only in production */}
+        {process.env.NEXT_PUBLIC_VERCEL_ENV === "production" && (
+          <>
+            <Script
+              src="https://www.googletagmanager.com/gtag/js?id=G-FFMMK4L8PP"
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-FFMMK4L8PP', { anonymize_ip: true });
+              `}
+            </Script>
+          </>
+        )}
 
-        {/* Microsoft Clarity — session recordings + heatmaps */}
-        <Script id="microsoft-clarity" strategy="afterInteractive">
-          {`
+        {/* Microsoft Clarity — only in production */}
+        {process.env.NEXT_PUBLIC_VERCEL_ENV === "production" && (
+          <Script id="microsoft-clarity" strategy="afterInteractive">
+            {`
             (function(c,l,a,r,i,t,y){
                 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
                 t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
                 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
             })(window, document, "clarity", "script", "wvkpr09c1o");
           `}
-        </Script>
+          </Script>
+        )}
 
         {/* Vercel Analytics */}
         <Analytics />

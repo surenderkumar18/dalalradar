@@ -138,12 +138,11 @@ export async function POST(req) {
 
     // ─── 7. Send the email via Resend ───────────────────────────────
     const { data, error } = await resend.emails.send({
-      // ⚠️ "onboarding@resend.dev" works without DNS setup for sending.
-      // Once you verify a custom domain in Resend, change to:
-      //   from: "DalalRadar <contact@dalalradar.com>",
-      from: "DalalRadar Contact <onboarding@resend.dev>",
+     // Sender uses verified dalalradar.com domain (DKIM + SPF set up at Cloudflare).
+    // To send from a different domain, verify it in Resend first.
+      from: "DalalRadar Contact <contact@dalalradar.com>",
       to: ["dalalradar@gmail.com"],
-      reply_to: email, // ← so you can hit Reply and respond to the sender
+      replyTo: email, // ← so you can hit Reply and respond to the sender
       subject: `[DalalRadar] ${topic} — ${name}`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0b1220; color: #e8e8ed; padding: 32px; border-radius: 8px;">
