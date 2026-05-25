@@ -1,21 +1,24 @@
 // app/layout.js
 //
-// 🎯 ROOT LAYOUT
-// Changes from prior version:
-//   ✅ Fixed metadata (was "Create Next App" — embarrassing in production)
-//   ✅ Added OpenGraph + Twitter cards (for social sharing)
-//   ✅ Switched to JetBrains Mono + Fraunces (matches landing page brand)
-//   ✅ Added theme color + favicon refs
-//   ✅ Set Indian locale
-//   ✅ Wired GA4 + Microsoft Clarity + Vercel Analytics
-//      → GA4 and Clarity only fire in production (NEXT_PUBLIC_VERCEL_ENV)
+// 🎯 ROOT LAYOUT — applies to EVERY page in app.dalalradar.com.
 //
-// 🆕 SEO UPDATE (May 2026):
-//   ✅ Blocks search engines from indexing app.dalalradar.com
-//      → app is a TOOL, not content. SEO traffic should go to dalalradar.com
-//   ✅ Removed `keywords` meta (Google ignores since 2009)
+// Current state:
+//   ✅ Real metadata (title, description, OG, Twitter)
+//   ✅ JetBrains Mono + Fraunces (matches landing brand)
+//   ✅ Theme color #0b1220 (brand navy)
+//   ✅ Indian locale (en_IN)
+//   ✅ Pinch-zoom enabled (a11y / WCAG 2.1)
+//   ✅ Blocks search engines from indexing the app
+//      → all SEO traffic should go to dalalradar.com (landing)
+//   ✅ GA4 + Microsoft Clarity gated to production only
+//      → no analytics noise from preview deployments or local dev
+//   ✅ Vercel Analytics always on (separates prod/preview internally)
 //
-// This file affects EVERY page in your app.
+// METADATA INHERITANCE:
+//   If you add `export const metadata = {...}` to any page.js, it MERGES
+//   with this layout's metadata — but `robots` does not always inherit
+//   safely. Best practice: don't re-declare `robots` in page.js; just
+//   override `title` and let everything else inherit.
 
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
@@ -26,8 +29,6 @@ import { JetBrains_Mono, Fraunces } from "next/font/google";
 // ─── BRAND FONTS ───────────────────────────────────────────────────────
 // JetBrains Mono → data, body, UI (terminal feel)
 // Fraunces       → display, headlines (editorial flair)
-//
-// These match dalalradar.com landing page exactly for brand consistency.
 const mono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
@@ -43,12 +44,6 @@ const display = Fraunces({
 });
 
 // ─── METADATA ─────────────────────────────────────────────────────────
-// Shows up in:
-//   - Browser tab title
-//   - Social media previews (WhatsApp, Twitter, LinkedIn shares)
-//   - NOT Google search results — we explicitly block indexing below.
-//     The app is a tool. All discovery traffic should land on the
-//     marketing site at dalalradar.com.
 export const metadata = {
   metadataBase: new URL("https://app.dalalradar.com"),
   title: {
@@ -70,8 +65,8 @@ export const metadata = {
   },
 
   // 🔒 BLOCK SEARCH ENGINES FROM INDEXING THE APP
-  // The app is a tool, not marketing content. Keep all SEO traffic on
-  // dalalradar.com (landing), then click-through to launch the app.
+  // The app is a tool, not marketing content. All SEO discovery should
+  // land on dalalradar.com (landing), then click through to launch the app.
   // This prevents tool URLs and query-param variants from polluting search.
   robots: {
     index: false,
@@ -85,8 +80,8 @@ export const metadata = {
   },
 
   // OG/Twitter STAY — these are for link sharing (WhatsApp/Twitter etc),
-  // which is independent of search indexing. When a user shares an app
-  // URL, they should still see a branded preview card.
+  // which is independent of search indexing. When a user shares an app URL,
+  // they should still see a branded preview card.
   openGraph: {
     title: "DalalRadar — Smart Money Tools",
     description:
@@ -120,8 +115,7 @@ export const viewport = {
   themeColor: "#0b1220",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: true,
+  userScalable: true, // a11y: allow pinch-zoom (WCAG 2.1 SC 1.4.4)
 };
 
 // ─── ROOT LAYOUT ──────────────────────────────────────────────────────
@@ -134,7 +128,6 @@ export default function RootLayout({ children }) {
       >
         {children}
 
-        {/* Google Analytics 4 */}
         {/* Google Analytics 4 — only in production */}
         {process.env.NEXT_PUBLIC_VERCEL_ENV === "production" && (
           <>
@@ -157,12 +150,12 @@ export default function RootLayout({ children }) {
         {process.env.NEXT_PUBLIC_VERCEL_ENV === "production" && (
           <Script id="microsoft-clarity" strategy="afterInteractive">
             {`
-            (function(c,l,a,r,i,t,y){
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "wvkpr09c1o");
-          `}
+              (function(c,l,a,r,i,t,y){
+                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "wvkpr09c1o");
+            `}
           </Script>
         )}
 

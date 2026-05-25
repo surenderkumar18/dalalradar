@@ -8,6 +8,7 @@
 import { TOOLS } from "@/lib/tools";
 import ToolCard from "./ToolCard";
 import DashboardHeader from "@/app/components/DashboardHeader";
+import SiteFooter from "@/components/SiteFooter";
 
 export default function ToolDashboard() {
   const liveCount = TOOLS.filter((t) => t.status === "live").length;
@@ -77,7 +78,7 @@ export default function ToolDashboard() {
           </div>
         </div>
       </main>
-
+      <SiteFooter />
       <style jsx>{`
         .nav {
           position: sticky;

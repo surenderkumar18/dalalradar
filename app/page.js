@@ -1,25 +1,24 @@
 // app/page.js
 //
-// 🎯 STEP 2 OF REFACTOR — Tool Dashboard
+// 🎯 TOOL DASHBOARD — root route of app.dalalradar.com
 //
-// BEFORE: Random redirect to /MarketStructure
-//   import { redirect } from 'next/navigation';
-//   export default function Home() {
-//     redirect('/MarketStructure');
-//   }
+// METADATA HANDLING:
+//   Only declare a custom title here. EVERYTHING ELSE (robots, openGraph,
+//   twitter, themeColor) is inherited from app/layout.js so the home page
+//   is correctly marked noindex and uses the right OG/Twitter cards.
 //
-// AFTER: Proper tool dashboard that:
-//   ✅ Shows all DalalRadar tools as cards
-//   ✅ Distinguishes "live" vs "soon" tools
-//   ✅ Lets users pick what they want to do
-//   ✅ Auto-updates when you add new tools to lib/tools.js
+//   ⚠️ DO NOT re-declare `description`, `openGraph`, `twitter`, or `robots`
+//   here unless you also re-declare ALL of them — Next.js shallow-merges
+//   metadata, and a partial override at the page level (esp. for `robots`)
+//   has previously caused this page to show as `index, follow` instead of
+//   the layout's `noindex, nofollow`. Inheriting from layout is the safe default.
 
 import ToolDashboard from "@/components/ToolDashboard";
 
 export const metadata = {
+  // Title only — uses the template "%s · DalalRadar" from layout.js,
+  // but `default` here overrides it cleanly for just the root route.
   title: "DalalRadar — Smart Money Tools",
-  description:
-    "Your dashboard of smart money tools for Dalal Street. BubbleChart for institutional flow, Rollover for F&O analytics, and more.",
 };
 
 export default function Home() {
