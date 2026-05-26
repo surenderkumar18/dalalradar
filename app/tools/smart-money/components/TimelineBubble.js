@@ -826,6 +826,14 @@ function TimelineBubble({
         const isActiveDate =
           currentActiveDate && Number(currentActiveDate) === Number(payload.x);
 
+        const isDateDimmed =
+  currentActiveDate &&
+  Number(currentActiveDate) !== Number(payload.x);  
+
+        const isExpiryDimmed =
+  activeExpiryRef.current &&
+  expiryGroupMap[Number(payload.x)] !== activeExpiryRef.current.index;
+
         const isRecent = Math.abs(payload.x - latestDate) < 1000;
 
         const timeOpacity = getTimeOpacity({
@@ -897,12 +905,14 @@ function TimelineBubble({
                 r={r * 1.55}
                 fill={sigStyle.glowColor || sigStyle.fill}
                 opacity={
-                  !activeCategoryRef.current
-                    ? 0.18
-                    : payload.stock === activeCategoryRef.current
-                      ? 0.18
-                      : 0.08
-                }
+  (isDateDimmed || isExpiryDimmed)
+    ? 0.02
+    : !activeCategoryRef.current
+      ? 0.18
+      : payload.stock === activeCategoryRef.current
+        ? 0.18
+        : 0.08
+}
                 style={{ pointerEvents: "none" }}
               />
             )}
@@ -917,12 +927,14 @@ function TimelineBubble({
                 stroke={sigStyle.fill}
                 strokeWidth={2}
                 opacity={
-                  !activeCategoryRef.current
-                    ? 0.7
-                    : payload.stock === activeCategoryRef.current
-                      ? 0.7
-                      : 0.08
-                }
+  (isDateDimmed || isExpiryDimmed)
+    ? 0.03
+    : !activeCategoryRef.current
+      ? 0.7
+      : payload.stock === activeCategoryRef.current
+        ? 0.7
+        : 0.08
+}
                 style={{ pointerEvents: "none" }}
               />
             )}
@@ -934,13 +946,15 @@ function TimelineBubble({
               r={r}
               ref={bubbleRefCallback}
               fill={sigStyle.fill}
-              opacity={
-                !activeCategoryRef.current
-                  ? finalOpacity
-                  : payload.stock === activeCategoryRef.current
-                    ? finalOpacity
-                    : 0.08
-              }
+             opacity={
+  (isDateDimmed || isExpiryDimmed)
+    ? 0.05
+    : !activeCategoryRef.current
+      ? finalOpacity
+      : payload.stock === activeCategoryRef.current
+        ? finalOpacity
+        : 0.08
+}
               data-id={bubbleKey}
               data-x={payload.x}
               data-weak="0"
@@ -969,11 +983,13 @@ function TimelineBubble({
                   pointerEvents: "none",
                   userSelect: "none",
                   textShadow: "0 0 3px rgba(0,0,0,0.9)",
-                  opacity: !activeCategoryRef.current
-                    ? 1
-                    : payload.stock === activeCategoryRef.current
-                      ? 1
-                      : 0.08,
+                  opacity: (isDateDimmed || isExpiryDimmed)
+  ? 0.04
+  : !activeCategoryRef.current
+    ? 1
+    : payload.stock === activeCategoryRef.current
+      ? 1
+      : 0.08,
                 }}
               >
                 {sigStyle.icon}
@@ -1025,6 +1041,14 @@ function TimelineBubble({
         const currentActiveDate = activeDateRef.current;
         const isActiveDate =
           currentActiveDate && Number(currentActiveDate) === Number(payload.x);
+
+        const isDateDimmed =
+  currentActiveDate &&
+  Number(currentActiveDate) !== Number(payload.x);  
+
+  const isExpiryDimmed =
+  activeExpiryRef.current &&
+  expiryGroupMap[Number(payload.x)] !== activeExpiryRef.current.index;
 
         const isRecent = Math.abs(payload.x - latestDate) < 1000;
 
@@ -1089,8 +1113,8 @@ function TimelineBubble({
 
         const computeOpacity = () => {
           if (currentActiveDate) {
-            return isActiveDate ? 0.5 : 0.05;
-          }
+  return isActiveDate ? 1 : 0.06;
+}
 
           if (activeCategoryRef.current) {
             return key === activeCategoryRef.current ? 0.8 : 0.08;
@@ -1178,7 +1202,7 @@ function TimelineBubble({
               data-weak={isWeak ? "1" : "0"}
               stroke={isWeak ? fill : "none"}
               strokeWidth={isWeak ? 1.2 : 0}
-              opacity={finalOpacity}
+              opacity={(isDateDimmed || isExpiryDimmed) ? 0.05 : finalOpacity}
             />
             {/* 🔥 HIT AREA — bigger transparent circle, catches ALL hover */}
             <circle

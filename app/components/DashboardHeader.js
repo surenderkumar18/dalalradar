@@ -151,7 +151,7 @@ export default function DashboardHeader({ children }) {
           letter-spacing: 0.8px;
           text-transform: uppercase;
           background: var(--green);
-          color: #0a0a0c;
+          color: #0b1220;
           border: 1px solid var(--green);
           text-decoration: none;
           transition: all 0.2s;
