@@ -1,9 +1,11 @@
 "use client";
 
 // ════════════════════════════════════════════════════════════
-//  MASTER ALPHA COMMANDER — Dashboard Page (v4 — fast)
-//  Place at: app/tools/market-alpha/page.js (or page.jsx)
-//  Whales now load lazily via separate endpoint.
+//  MASTER ALPHA COMMANDER — Dashboard Page (v5 — expandable)
+//  Place at: app/tools/market-alpha/page.js
+//
+//  New in v5: Click a sector row to expand and see all stocks
+//  in that sector with their performance over the selected period.
 // ════════════════════════════════════════════════════════════
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -14,6 +16,7 @@ import {
 import {
   TrendingUp, Flame, Layers, Activity, AlertTriangle,
   ShieldCheck, Waves, RefreshCw, Sun, Moon, Loader2, Zap,
+  ChevronDown, ChevronRight,
 } from "lucide-react";
 
 import DashboardHeader from "@/app/components/DashboardHeader";
@@ -64,6 +67,167 @@ const TONE_LIGHT = {
 };
 
 /* ════════════════════════════════════════════════════════════
+   SECTOR DETAIL — expandable sub-panel for one sector
+═══════════════════════════════════════════════════════════ */
+function SectorDetail({ sector, period, isDark, subText, periodLabel }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetch(
+      `/api/market-alpha/sector-stocks?sector=${encodeURIComponent(sector)}&period=${period}&_t=${Date.now()}`,
+      { cache: "no-store" }
+    )
+      .then(async (res) => {
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || `HTTP ${res.status}`);
+        return json;
+      })
+      .then((json) => {
+        if (cancelled) return;
+        setData(json);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err.message);
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [sector, period]);
+
+  if (loading) {
+    return (
+      <div className={`px-3 py-4 flex items-center justify-center gap-2 text-xs ${subText}`}>
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        Loading {sector} stocks…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="px-3 py-3 text-xs text-rose-400 flex items-center gap-2">
+        <AlertTriangle className="w-3.5 h-3.5" /> {error}
+      </div>
+    );
+  }
+
+  const stocks = data?.stocks || [];
+  if (stocks.length === 0) {
+    return <div className={`px-3 py-3 text-xs ${subText}`}>No stocks loaded.</div>;
+  }
+
+  const benchChg = data?.benchmarkPctChg;
+
+  return (
+    <div className={`px-2 py-2 ${isDark ? "bg-slate-950/60" : "bg-slate-100/70"}`}>
+      {/* Sub-header */}
+      <div className="flex items-center justify-between px-2 py-1.5 mb-1">
+        <div className={`text-[10px] uppercase tracking-wider font-bold ${subText}`}>
+          Stocks · {periodLabel}
+        </div>
+        {benchChg != null && (
+          <div className={`text-[10px] font-mono ${subText}`}>
+            Nifty:{" "}
+            <span className={benchChg >= 0 ? "text-emerald-400" : "text-rose-400"}>
+              {benchChg >= 0 ? "+" : ""}{benchChg.toFixed(2)}%
+            </span>
+            {data.fromCache && (
+              <span className="ml-2 text-[9px] text-emerald-500/70">CACHED</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Column labels */}
+      <div className={`grid grid-cols-12 gap-1 px-2 py-1 text-[9px] uppercase tracking-wider font-bold ${subText}`}>
+        <span className="col-span-4">Ticker</span>
+        <span className="col-span-2 text-right">Price</span>
+        <span className="col-span-2 text-right">% Chg</span>
+        <span className="col-span-2 text-right">vs Nifty</span>
+        <span className="col-span-2 text-right">5D</span>
+      </div>
+
+      {/* Stock rows */}
+      <div className="space-y-0.5">
+        {stocks.map((s) => {
+          if (s.status === "no-data") {
+            return (
+              <div
+                key={s.ticker}
+                className={`grid grid-cols-12 gap-1 items-center px-2 py-1.5 text-[11px] rounded ${subText}`}
+              >
+                <span className="col-span-4 font-mono truncate font-medium">
+                  {s.ticker.replace(".NS", "")}
+                </span>
+                <span className="col-span-8 text-right italic text-[10px] opacity-60">
+                  no data
+                </span>
+              </div>
+            );
+          }
+          const isOutperforming = benchChg != null && s.pctChg > benchChg;
+          return (
+            <div
+              key={s.ticker}
+              className={`grid grid-cols-12 gap-1 items-center px-2 py-1.5 text-[11px] rounded transition ${
+                isDark ? "hover:bg-slate-800/60" : "hover:bg-white"
+              }`}
+            >
+              <span className="col-span-4 font-mono truncate font-semibold">
+                {s.ticker.replace(".NS", "")}
+              </span>
+              <span className="col-span-2 font-mono text-right tabular-nums">
+                ₹{s.endPrice?.toFixed(0)}
+              </span>
+              <span
+                className={`col-span-2 font-mono text-right tabular-nums font-bold ${
+                  s.pctChg >= 0 ? "text-emerald-400" : "text-rose-400"
+                }`}
+              >
+                {s.pctChg >= 0 ? "+" : ""}
+                {s.pctChg.toFixed(1)}%
+              </span>
+              <span
+                className={`col-span-2 font-mono text-right tabular-nums ${
+                  s.rsVsBench == null
+                    ? subText
+                    : s.rsVsBench >= 0
+                    ? "text-cyan-400"
+                    : "text-amber-400"
+                }`}
+              >
+                {s.rsVsBench == null
+                  ? "–"
+                  : `${s.rsVsBench >= 0 ? "+" : ""}${s.rsVsBench.toFixed(1)}`}
+              </span>
+              <span
+                className={`col-span-2 font-mono text-right tabular-nums text-[10px] ${
+                  s.recentChg == null
+                    ? subText
+                    : s.recentChg >= 0
+                    ? "text-emerald-400/80"
+                    : "text-rose-400/80"
+                }`}
+              >
+                {s.recentChg == null
+                  ? "–"
+                  : `${s.recentChg >= 0 ? "+" : ""}${s.recentChg.toFixed(1)}`}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
    PAGE COMPONENT
 ═══════════════════════════════════════════════════════════ */
 export default function MarketAlphaPage() {
@@ -82,15 +246,18 @@ export default function MarketAlphaPage() {
   const [whalesLoading, setWhalesLoading] = useState(false);
   const [whalesError, setWhalesError] = useState(null);
 
+  // Expanded sectors — Set of sector names currently expanded
+  const [expandedSectors, setExpandedSectors] = useState(new Set());
+
   /* ─── Fetch ranking ─── */
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    setWhales(null); // reset whales on period change
+    setWhales(null);
     setWhalesError(null);
+    setExpandedSectors(new Set()); // collapse all on period change
 
-    // cache-bust + no-store to defeat any browser/Next.js fetch cache
     const cacheBuster = Date.now();
     fetch(`/api/market-alpha?period=${period}&_t=${cacheBuster}`, {
       cache: "no-store",
@@ -108,7 +275,6 @@ export default function MarketAlphaPage() {
       })
       .then((json) => {
         if (cancelled) return;
-        // Sanity check: did the server actually return data for the period we asked for?
         if (json.period && json.period !== period) {
           console.warn(`Period mismatch: requested ${period}, got ${json.period}`);
         }
@@ -124,6 +290,15 @@ export default function MarketAlphaPage() {
   }, [period, refreshKey]);
 
   const isDark = theme === "dark";
+
+  const toggleSector = (sector) => {
+    setExpandedSectors((prev) => {
+      const next = new Set(prev);
+      if (next.has(sector)) next.delete(sector);
+      else next.add(sector);
+      return next;
+    });
+  };
 
   /* ─── VIX regime ─── */
   const vixRegime = useMemo(() => {
@@ -195,6 +370,14 @@ export default function MarketAlphaPage() {
     if (!d) return "";
     return new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
   };
+
+  const periodLabel = useMemo(() => {
+    const map = {
+      "1wk": "1 Week", "15d": "15 Days", "1mo": "1 Month",
+      "3mo": "3 Months", "6mo": "6 Months", "1y": "1 Year", "2y": "2 Years",
+    };
+    return map[period] || period;
+  }, [period]);
 
   /* ─── Lazy whale loader ─── */
   const loadWhales = async () => {
@@ -277,7 +460,7 @@ export default function MarketAlphaPage() {
 
   return (
     <div className={`min-h-screen ${themeBg} ${themeText} transition-colors duration-300`}>
-       <DashboardHeader />
+      <DashboardHeader />
       {/* Atmospheric background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className={`absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full blur-3xl ${isDark ? "bg-cyan-500/5" : "bg-cyan-500/10"}`}></div>
@@ -286,46 +469,79 @@ export default function MarketAlphaPage() {
 
       <div className="relative p-4 md:p-6 lg:p-8 mx-auto">
 
-        {/* HEADER */}
-        <header className={`mb-6 p-5 border ${cardBg} ${cardBorder}`}>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h1 className="flex items-center gap-3 text-2xl font-black tracking-tight">
-                <div className="relative">
-                  <Layers className="text-cyan-500 w-7 h-7" />
-                  <div className="absolute inset-0 blur-md bg-cyan-500/40"></div>
+        {/* ════════════════════════════════════════════════
+            MERGED HEADER + VIX BAR (single row)
+        ════════════════════════════════════════════════ */}
+        <header
+          className={`mb-6 border ${cardBg} ${cardBorder} border-l-4 ${vixRegime.ring.replace("ring-", "border-")} overflow-hidden`}
+        >
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3">
+
+            {/* LEFT: Brand + meta */}
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative flex-shrink-0">
+                <Layers className="text-cyan-500 w-6 h-6" />
+                <div className="absolute inset-0 blur-md bg-cyan-500/40"></div>
+              </div>
+              <div className="min-w-0">
+                <h1 className="flex items-center gap-2 text-base font-black tracking-tight leading-none">
+                  <span className="whitespace-nowrap">MASTER ALPHA <span className="text-cyan-500">COMMANDER</span></span>
+                  <span className="text-[9px] font-mono bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded">v5</span>
+                </h1>
+                <div className={`mt-1 text-[10px] ${subText} flex items-center gap-1.5 flex-wrap leading-none`}>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 text-[9px] font-bold uppercase tracking-wider">
+                    {data.period || period}
+                  </span>
+                  <span className="opacity-80">{data.dateRange.days}d</span>
+                  {data.dateRange.start && (
+                    <>
+                      <span className="opacity-40">·</span>
+                      <span className="opacity-80">{formatDateShort(data.dateRange.start)} → {formatDateShort(data.dateRange.end)}</span>
+                    </>
+                  )}
+                  {data.fromCache && (
+                    <>
+                      <span className="opacity-40">·</span>
+                      <span className="inline-flex items-center gap-0.5 text-emerald-400 font-bold">
+                        <Zap className="w-2.5 h-2.5" /> {data.cacheAgeSec ? `${data.cacheAgeSec}s` : "cached"}
+                      </span>
+                    </>
+                  )}
+                  {!data.fromCache && data.elapsedSec != null && (
+                    <>
+                      <span className="opacity-40">·</span>
+                      <span className="opacity-60 font-mono">{data.elapsedSec}s fresh</span>
+                    </>
+                  )}
                 </div>
-                <span>MASTER ALPHA <span className="text-cyan-500">COMMANDER</span></span>
-                <span className="text-[10px] font-mono bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded">
-                  v4
-                </span>
-              </h1>
-              <p className={`text-xs mt-1.5 ${subText} flex items-center gap-2 flex-wrap`}>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-400 text-[11px] font-bold uppercase">
-                  Period: {data.period || period}
-                </span>
-                <span>Relative-strength tracker vs Nifty 50 • {data.dateRange.days} days</span>
-                {data.dateRange.start && (
-                  <> • {formatDateShort(data.dateRange.start)} → {formatDateShort(data.dateRange.end)}</>
-                )}
-                {data.fromCache && (
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-[10px] font-bold">
-                    <Zap className="w-3 h-3" /> CACHED {data.cacheAgeSec ? `${data.cacheAgeSec}s` : ""}
-                  </span>
-                )}
-                {!data.fromCache && data.elapsedSec != null && (
-                  <span className="text-[10px] font-mono opacity-70">
-                    ({data.elapsedSec}s fresh)
-                  </span>
-                )}
-              </p>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            {/* CENTER-RIGHT: VIX regime chip */}
+            <div className={`flex items-center gap-3 px-3 py-1.5 rounded-md ${vixRegime.bg} ${vixRegime.ring} ring-1`}>
+              <vixRegime.icon className={`w-4 h-4 ${vixRegime.text} flex-shrink-0`} />
+              <div className="flex items-baseline gap-2">
+                <span className={`text-xs font-black tracking-wide ${vixRegime.text}`}>
+                  {vixRegime.label}
+                </span>
+                <span className={`text-[10px] font-mono opacity-90 ${vixRegime.text}`}>
+                  VIX {data.vix?.toFixed(2)}
+                </span>
+                <span className={`text-[10px] ${subText} hidden sm:inline`}>
+                  · {vixRegime.action}
+                </span>
+              </div>
+            </div>
+
+            {/* SPACER */}
+            <div className="flex-1"></div>
+
+            {/* RIGHT: Controls */}
+            <div className="flex flex-wrap items-center gap-1.5">
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className={`text-xs px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
+                className={`text-xs px-2.5 py-1.5 rounded-md border focus:outline-none focus:ring-2 focus:ring-cyan-500/30 ${
                   isDark ? "bg-slate-800 border-slate-700 text-slate-200" : "bg-white border-slate-300 text-slate-700"
                 }`}
               >
@@ -340,115 +556,154 @@ export default function MarketAlphaPage() {
 
               <button
                 onClick={() => setDisplayMode((m) => (m === "all" ? "filtered" : "all"))}
-                className="text-xs px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium transition"
+                className="text-xs px-2.5 py-1.5 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-medium transition whitespace-nowrap"
               >
-                {displayMode === "all" ? `Show: All (${allSorted.length})` : `Show: Top ${topN}+Bot ${bottomN}`}
+                {displayMode === "all" ? `All (${allSorted.length})` : `Top ${topN}+Bot ${bottomN}`}
               </button>
 
               <button
                 onClick={() => setRefreshKey((k) => k + 1)}
-                className={`text-xs px-3 py-2 rounded-lg border transition flex items-center gap-1.5 ${
+                className={`text-xs px-2.5 py-1.5 rounded-md border transition flex items-center gap-1 ${
                   isDark ? "border-slate-700 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-100"
                 }`}
+                title="Refresh data"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Refresh
+                <RefreshCw className="w-3.5 h-3.5" />
               </button>
 
               <button
                 onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
-                className={`text-xs px-3 py-2 rounded-lg border transition flex items-center gap-1.5 ${
+                className={`text-xs px-2.5 py-1.5 rounded-md border transition flex items-center gap-1 ${
                   isDark ? "border-slate-700 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-100"
                 }`}
+                title={isDark ? "Switch to light" : "Switch to dark"}
               >
                 {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-                {isDark ? "Light" : "Dark"}
               </button>
             </div>
           </div>
         </header>
 
-        {/* VIX BANNER */}
-        <div className={`mb-6 p-4 border-2 ${vixRegime.ring} ${vixRegime.bg} flex flex-wrap items-center justify-between gap-4`}>
-          <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl ${vixRegime.solid} flex items-center justify-center`}>
-              <vixRegime.icon className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className={`text-xs uppercase tracking-widest ${subText} font-semibold`}>Market Regime</div>
-              <div className={`text-2xl font-black ${vixRegime.text}`}>{vixRegime.label}</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="text-right">
-              <div className={`text-xs uppercase tracking-wide ${subText}`}>India VIX</div>
-              <div className={`text-2xl font-mono font-bold ${vixRegime.text}`}>{data.vix?.toFixed(2)}</div>
-            </div>
-            <div className={`h-12 w-px ${dividerColor} border-l`}></div>
-            <div className="text-right">
-              <div className={`text-xs uppercase tracking-wide ${subText}`}>Position Sizing</div>
-              <div className={`text-sm font-bold ${vixRegime.text}`}>{vixRegime.action}</div>
-            </div>
-          </div>
-        </div>
-
         {/* MAIN GRID */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
 
-          {/* RANKING TABLE */}
+          {/* ─────────── RANKING TABLE (expandable) ─────────── */}
           <aside className={`xl:col-span-4 p-5 border ${cardBg} ${cardBorder} h-fit`}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
                 <Flame className="text-amber-500 w-4 h-4" />
                 Sector Rankings
               </h3>
-              <span className={`text-[10px] font-mono ${subText}`}>{allSorted.length} sectors</span>
+              <div className="flex items-center gap-2">
+                {expandedSectors.size > 0 && (
+                  <button
+                    onClick={() => setExpandedSectors(new Set())}
+                    className={`text-[10px] px-2 py-0.5 rounded border transition ${
+                      isDark
+                        ? "border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                        : "border-slate-300 text-slate-500 hover:border-slate-400 hover:text-slate-700"
+                    }`}
+                    title="Collapse all expanded sectors"
+                  >
+                    Collapse all
+                  </button>
+                )}
+                <span className={`text-[10px] font-mono ${subText}`}>{allSorted.length} sectors</span>
+              </div>
             </div>
 
-            <div className="space-y-1.5 max-h-[700px] overflow-y-auto pr-1 -mr-1 custom-scroll">
+            <p className={`text-[10px] mb-3 ${subText} italic`}>
+              Click any sector to see its stocks over {periodLabel.toLowerCase()}.
+            </p>
+
+            <div className="space-y-1.5 max-h-[920px] overflow-y-auto pr-1 -mr-1 custom-scroll">
               {allSorted.map((sector, idx) => {
                 const score = data.finalScores[sector];
                 const action = classifyAction(score);
                 const color = colorMap[sector];
                 const isLeader = idx < topN;
                 const isLaggard = idx >= allSorted.length - bottomN;
+                const isExpanded = expandedSectors.has(sector);
 
                 return (
                   <div
                     key={sector}
-                    className={`group flex items-center gap-3 p-2.5 rounded-lg border transition hover:scale-[1.01] ${
-                      isDark ? "bg-slate-950/50 border-slate-800/60 hover:border-slate-700" : "bg-slate-50 border-slate-200 hover:border-slate-300"
+                    className={`rounded-lg border overflow-hidden transition ${
+                      isDark
+                        ? `bg-slate-950/50 ${isExpanded ? "border-cyan-500/40" : "border-slate-800/60 hover:border-slate-700"}`
+                        : `bg-slate-50 ${isExpanded ? "border-cyan-500/60" : "border-slate-200 hover:border-slate-300"}`
                     }`}
                   >
-                    <div className={`flex items-center justify-center w-7 h-7 rounded-md text-[11px] font-mono font-bold ${
-                      isLeader ? "bg-emerald-500/20 text-emerald-400" :
-                      isLaggard ? "bg-rose-500/20 text-rose-400" :
-                      isDark ? "bg-slate-800 text-slate-500" : "bg-slate-200 text-slate-500"
-                    }`}>
-                      {idx + 1}
-                    </div>
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <div className="w-1 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: color }}></div>
-                      <span className="text-sm font-semibold truncate">{sector}</span>
-                    </div>
-                    <div className="font-mono text-sm font-bold tabular-nums">{score.toFixed(1)}</div>
-                    <div className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ${toneMap[action.tone]}`}>
-                      {action.label}
-                    </div>
+                    {/* Clickable row */}
+                    <button
+                      onClick={() => toggleSector(sector)}
+                      className={`w-full flex items-center gap-2 p-2.5 text-left transition ${
+                        isDark ? "hover:bg-slate-900/40" : "hover:bg-white"
+                      }`}
+                      aria-expanded={isExpanded}
+                    >
+                      {/* Chevron */}
+                      <div className={`flex items-center justify-center w-4 ${subText}`}>
+                        {isExpanded ? (
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        )}
+                      </div>
+
+                      {/* Rank */}
+                      <div className={`flex items-center justify-center w-7 h-7 rounded-md text-[11px] font-mono font-bold flex-shrink-0 ${
+                        isLeader ? "bg-emerald-500/20 text-emerald-400" :
+                        isLaggard ? "bg-rose-500/20 text-rose-400" :
+                        isDark ? "bg-slate-800 text-slate-500" : "bg-slate-200 text-slate-500"
+                      }`}>
+                        {idx + 1}
+                      </div>
+
+                      {/* Color swatch + name */}
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <div className="w-1 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: color }}></div>
+                        <span className="text-sm font-semibold truncate">{sector}</span>
+                      </div>
+
+                      {/* Score */}
+                      <div className="font-mono text-sm font-bold tabular-nums flex-shrink-0">
+                        {score.toFixed(1)}
+                      </div>
+
+                      {/* Action badge */}
+                      <div className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 ${toneMap[action.tone]}`}>
+                        {action.label}
+                      </div>
+                    </button>
+
+                    {/* Expanded panel */}
+                    {isExpanded && (
+                      <div className={`border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+                        <SectorDetail
+                          sector={sector}
+                          period={period}
+                          isDark={isDark}
+                          subText={subText}
+                          periodLabel={periodLabel}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
           </aside>
 
-          {/* CHART */}
+          {/* ─────────── CHART ─────────── */}
           <main className={`xl:col-span-8 p-5 border ${cardBg} ${cardBorder}`}>
             <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
               <div>
-                <h2 className="text-lg font-bold flex items-center gap-2">
+                <h2 className="text-lg font-bold flex items-center gap-2 mb-0" style={{marginBottom: 0}}>
                   <Activity className="w-5 h-5 text-cyan-500" />
                   Relative Strength vs Nifty (Base = 100)
                 </h2>
-                <p className={`text-xs mt-1 ${subText}`}>
+                <p className={`text-xs mt-1 ${subText}`}  style={{marginBottom: 0}}>
                   Values &gt; 100 = outperforming Nifty • Showing {displayedSectors.length} of {allSorted.length} sectors
                 </p>
                 {(period === "1wk" || period === "15d") && (
@@ -474,7 +729,7 @@ export default function MarketAlphaPage() {
               </div>
             </div>
 
-            <div className="h-[560px] w-full">
+            <div className="h-[720px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData} margin={{ top: 12, right: 110, left: -10, bottom: 8 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
@@ -503,7 +758,6 @@ export default function MarketAlphaPage() {
                     const val = data.finalScores[sector];
                     const strokeWidth = (val >= 115 || val <= 88) ? 2.8 :
                                         (val >= 105 || val <= 95) ? 2 : 1.4;
-                    const lastDate = chartData[chartData.length - 1]?.date;
                     return (
                       <Line
                         key={sector} type="monotone" dataKey={sector}
@@ -515,27 +769,20 @@ export default function MarketAlphaPage() {
                           position="right"
                           content={(props) => {
                             const { x, y, value, index } = props;
-                            // Only render label on the LAST data point
                             if (index !== chartData.length - 1) return null;
                             if (value == null || x == null || y == null) return null;
                             return (
                               <g>
-                                {/* Small connector dot */}
                                 <circle
-                                  cx={x}
-                                  cy={y}
-                                  r={3}
+                                  cx={x} cy={y} r={3}
                                   fill={colorMap[sector]}
                                   stroke={isDark ? "#0f172a" : "#fff"}
                                   strokeWidth={1.5}
                                 />
-                                {/* Label text */}
                                 <text
-                                  x={x + 8}
-                                  y={y}
+                                  x={x + 8} y={y}
                                   fill={colorMap[sector]}
-                                  fontSize={11}
-                                  fontWeight={700}
+                                  fontSize={11} fontWeight={700}
                                   dominantBaseline="middle"
                                   textAnchor="start"
                                   style={{ pointerEvents: "none" }}
@@ -612,7 +859,6 @@ export default function MarketAlphaPage() {
             )}
           </div>
 
-          {/* Empty state */}
           {!whales && !whalesLoading && !whalesError && (
             <div className={`p-8 rounded-xl border-2 border-dashed text-center ${
               isDark ? "border-slate-800 bg-slate-950/30" : "border-slate-200 bg-slate-50"
@@ -627,7 +873,6 @@ export default function MarketAlphaPage() {
             </div>
           )}
 
-          {/* Loading */}
           {whalesLoading && (
             <div className={`p-8 rounded-xl text-center ${isDark ? "bg-slate-950/30" : "bg-slate-50"}`}>
               <Loader2 className="w-8 h-8 mx-auto mb-3 text-purple-400 animate-spin" />
@@ -635,7 +880,6 @@ export default function MarketAlphaPage() {
             </div>
           )}
 
-          {/* Error */}
           {whalesError && (
             <div className="p-4 rounded-xl border border-rose-500/30 bg-rose-500/10">
               <div className="flex items-center gap-2 text-rose-400 text-sm">
@@ -650,10 +894,8 @@ export default function MarketAlphaPage() {
             </div>
           )}
 
-          {/* Whale results */}
           {whales && (
             <>
-              {/* Top global signals */}
               {whales.topWhaleSignals?.length > 0 && (
                 <div className={`mb-6 p-4 rounded-xl border ${
                   isDark ? "border-purple-500/30 bg-purple-500/5" : "border-purple-300 bg-purple-50"
@@ -709,7 +951,6 @@ export default function MarketAlphaPage() {
                 </div>
               )}
 
-              {/* Per-sector breakdown */}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {Object.entries(whales.whalePerSector || {}).map(([sector, stocks]) => {
                   const rsVal = data.finalScores[sector];
@@ -761,8 +1002,8 @@ export default function MarketAlphaPage() {
           )}
         </section>
       </div>
-      
-            <SiteFooter />
+
+      <SiteFooter />
       <style jsx global>{`
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
