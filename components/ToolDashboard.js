@@ -33,7 +33,7 @@ export default function ToolDashboard() {
               Smart Money Toolkit · v1.0 beta
             </div>
             <h1 className="dashboard-headline">
-              Welcome <span className="dashboard-em">back.</span>
+              What's the <span className="dashboard-em">smart money</span> saying today?
             </h1>
             <p className="dashboard-subhead">
               {liveCount} {liveCount === 1 ? "tool" : "tools"} ready.{" "}
@@ -194,7 +194,6 @@ export default function ToolDashboard() {
         /* ─── WELCOME ─── */
         .dashboard-welcome {
           margin-bottom: 60px;
-          max-width: 720px;
         }
 
         .dashboard-eyebrow {

@@ -15,73 +15,139 @@ try { yahooFinance.suppressNotices?.(["yahooSurvey", "ripHistorical"]); } catch 
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const maxDuration = 60;
+export const maxDuration = 90;
 
-const CONCURRENCY = 5;
+const CONCURRENCY = 8;
 const CACHE_TTL_MS = 8 * 60 * 1000; // 8-minute cache
 const BENCHMARK = "^NSEI";
 
 /* ════════════════════════════════════════════════════════════
-   SECTOR STOCK LISTS — must match the main route's lists
-   so RS values stay consistent.
+   FULL F&O SECTOR UNIVERSE
+   ──────────────────────────────────────────────────────────
+   Every F&O-eligible stock on NSE, classified into the same
+   21 sectors used by the ranking engine. The ranking engine
+   uses a SLIM subset (5-8 reps per sector) for speed; this
+   endpoint exposes the FULL list when a user expands a sector.
+   
+   Source: NSE F&O list classified by sector. Update quarterly
+   as F&O additions/removals happen.
 ═══════════════════════════════════════════════════════════ */
 const SECTOR_STOCKS = {
   Auto: [
     "MARUTI.NS", "M&M.NS", "TATAMOTORS.NS", "BAJAJ-AUTO.NS",
     "EICHERMOT.NS", "HEROMOTOCO.NS", "TVSMOTOR.NS",
+    "ASHOKLEY.NS", "MOTHERSON.NS", "BOSCHLTD.NS", "BHARATFORG.NS",
+    "BALKRISIND.NS", "MRF.NS", "APOLLOTYRE.NS", "EXIDEIND.NS",
+    "TIINDIA.NS", "SONACOMS.NS",
   ],
   BANK_PRIVATE: [
     "HDFCBANK.NS", "ICICIBANK.NS", "AXISBANK.NS", "KOTAKBANK.NS",
-    "INDUSINDBK.NS", "IDFCFIRSTB.NS",
+    "INDUSINDBK.NS", "IDFCFIRSTB.NS", "FEDERALBNK.NS", "BANDHANBNK.NS",
+    "AUBANK.NS", "RBLBANK.NS", "YESBANK.NS",
   ],
   BANK_PSU: [
     "SBIN.NS", "BANKBARODA.NS", "CANBK.NS", "PNB.NS", "INDIANB.NS",
+    "UNIONBANK.NS", "IOB.NS", "BANKINDIA.NS",
   ],
   CapitalGoods: [
     "SIEMENS.NS", "ABB.NS", "HAL.NS", "BEL.NS", "CGPOWER.NS",
-    "POLYCAB.NS", "HAVELLS.NS",
+    "POLYCAB.NS", "HAVELLS.NS", "CUMMINSIND.NS", "BHEL.NS",
+    "THERMAX.NS", "ASTRAL.NS", "VOLTAS.NS", "CROMPTON.NS",
+    "KEI.NS", "SUPREMEIND.NS", "DIXON.NS", "AMBER.NS",
+    "KAYNES.NS", "TIINDIA.NS",
   ],
   Cement: [
-    "ULTRACEMCO.NS", "GRASIM.NS", "AMBUJACEM.NS", "SHREECEM.NS", "DALBHARAT.NS",
+    "ULTRACEMCO.NS", "GRASIM.NS", "AMBUJACEM.NS", "SHREECEM.NS",
+    "DALBHARAT.NS", "ACC.NS", "JKCEMENT.NS", "RAMCOCEM.NS",
   ],
   Chemical: [
     "ASIANPAINT.NS", "PIDILITIND.NS", "SRF.NS", "PIIND.NS", "UPL.NS",
+    "BERGEPAINT.NS", "DEEPAKNTR.NS", "AARTIIND.NS", "TATACHEM.NS",
+    "NAVINFLUOR.NS", "ATUL.NS", "GNFC.NS", "COROMANDEL.NS",
+    "CHAMBLFERT.NS", "GUJGASLTD.NS",
   ],
   Energy: [
     "RELIANCE.NS", "ONGC.NS", "NTPC.NS", "POWERGRID.NS",
-    "BPCL.NS", "IOC.NS", "TATAPOWER.NS",
+    "BPCL.NS", "IOC.NS", "TATAPOWER.NS", "HINDPETRO.NS",
+    "GAIL.NS", "ADANIPOWER.NS", "ADANIGREEN.NS", "JSWENERGY.NS",
+    "NHPC.NS", "SJVN.NS", "TORNTPOWER.NS", "IGL.NS", "PETRONET.NS",
+    "OIL.NS", "MGL.NS",
   ],
   Exchange: [
     "BSE.NS", "CDSL.NS", "MCX.NS", "ANGELONE.NS", "CAMS.NS",
+    "KFINTECH.NS",
   ],
   FMCG: [
     "HINDUNILVR.NS", "ITC.NS", "NESTLEIND.NS", "BRITANNIA.NS",
-    "DABUR.NS", "TATACONSUM.NS",
+    "DABUR.NS", "TATACONSUM.NS", "GODREJCP.NS", "COLPAL.NS",
+    "MARICO.NS", "UBL.NS", "VBL.NS", "PGHH.NS", "EMAMILTD.NS",
+    "RADICO.NS", "HATSUN.NS",
   ],
-  Hospital: ["APOLLOHOSP.NS", "MAXHEALTH.NS", "FORTIS.NS"],
+  Hospital: [
+    "APOLLOHOSP.NS", "MAXHEALTH.NS", "FORTIS.NS", "GLOBALHEALT.NS",
+    "MEDANTA.NS", "NH.NS", "KIMS.NS", "RAINBOW.NS",
+  ],
   IT: [
     "TCS.NS", "INFY.NS", "HCLTECH.NS", "WIPRO.NS",
-    "LTIM.NS", "TECHM.NS", "PERSISTENT.NS",
+    "LTIM.NS", "TECHM.NS", "PERSISTENT.NS", "COFORGE.NS",
+    "MPHASIS.NS", "LTTS.NS", "OFSS.NS", "TATAELXSI.NS",
+    "KPITTECH.NS", "BSOFT.NS", "INTELLECT.NS",
   ],
-  Infra: ["LT.NS", "ADANIPORTS.NS", "ADANIENT.NS", "RVNL.NS"],
-  Insurance: ["SBILIFE.NS", "HDFCLIFE.NS", "ICICIPRULI.NS", "LICI.NS", "ICICIGI.NS"],
-  Internet: ["NAUKRI.NS", "POLICYBZR.NS", "PAYTM.NS"],
-  Logistics: ["INDIGO.NS", "IRCTC.NS", "CONCOR.NS", "DELHIVERY.NS"],
+  Infra: [
+    "LT.NS", "ADANIPORTS.NS", "ADANIENT.NS", "RVNL.NS",
+    "IRCON.NS", "NCC.NS", "KEC.NS", "GMRINFRA.NS",
+    "GMRAIRPORT.NS", "JSWINFRA.NS", "IRB.NS", "PNCINFRA.NS",
+  ],
+  Insurance: [
+    "SBILIFE.NS", "HDFCLIFE.NS", "ICICIPRULI.NS", "LICI.NS",
+    "ICICIGI.NS", "MAXFIN.NS", "STARHEALTH.NS", "NIACL.NS",
+    "GICRE.NS",
+  ],
+  Internet: [
+    "NAUKRI.NS", "POLICYBZR.NS", "PAYTM.NS", "ZOMATO.NS",
+    "NYKAA.NS", "CARTRADE.NS", "EASEMYTRIP.NS", "IXIGO.NS",
+  ],
+  Logistics: [
+    "INDIGO.NS", "IRCTC.NS", "CONCOR.NS", "DELHIVERY.NS",
+    "TCI.NS", "BLUEDART.NS", "MAHLOG.NS", "GATI.NS",
+    "VRLLOG.NS",
+  ],
   Metal: [
     "TATASTEEL.NS", "JSWSTEEL.NS", "HINDALCO.NS", "VEDL.NS",
-    "COALINDIA.NS", "JINDALSTEL.NS",
+    "COALINDIA.NS", "JINDALSTEL.NS", "SAIL.NS", "NMDC.NS",
+    "NATIONALUM.NS", "HINDZINC.NS", "HINDCOPPER.NS", "APLAPOLLO.NS",
+    "JSWHL.NS", "RATNAMANI.NS", "WELCORP.NS", "WELSPUNLIV.NS",
   ],
   NBFC: [
     "BAJFINANCE.NS", "BAJAJFINSV.NS", "SHRIRAMFIN.NS", "CHOLAFIN.NS",
-    "JIOFIN.NS", "PFC.NS", "RECLTD.NS",
+    "JIOFIN.NS", "PFC.NS", "RECLTD.NS", "MUTHOOTFIN.NS",
+    "MANAPPURAM.NS", "L&TFH.NS", "IIFL.NS", "AAVAS.NS",
+    "HDFCAMC.NS", "ABCAPITAL.NS", "POONAWALLA.NS", "PEL.NS",
+    "SBICARD.NS", "M&MFIN.NS", "PNBHOUSING.NS", "CANFINHOME.NS",
+    "LICHSGFIN.NS", "IDFC.NS",
   ],
   Pharma: [
     "SUNPHARMA.NS", "DRREDDY.NS", "CIPLA.NS", "DIVISLAB.NS",
-    "LUPIN.NS", "TORNTPHARM.NS", "ZYDUSLIFE.NS",
+    "LUPIN.NS", "TORNTPHARM.NS", "ZYDUSLIFE.NS", "AUROPHARMA.NS",
+    "ALKEM.NS", "BIOCON.NS", "GLENMARK.NS", "MANKIND.NS",
+    "GLAND.NS", "LAURUSLABS.NS", "ABBOTINDIA.NS", "GRANULES.NS",
+    "IPCALAB.NS", "PFIZER.NS", "SANOFI.NS", "AJANTPHARM.NS",
+    "SYNGENE.NS", "JBCHEPHARM.NS",
   ],
-  Realty: ["DLF.NS", "LODHA.NS", "GODREJPROP.NS", "OBEROIRLTY.NS", "PRESTIGE.NS"],
-  Retail: ["TITAN.NS", "TRENT.NS", "DMART.NS", "NYKAA.NS", "KALYANKJIL.NS"],
-  Telecom: ["BHARTIARTL.NS", "INDUSTOWER.NS", "IDEA.NS"],
+  Realty: [
+    "DLF.NS", "LODHA.NS", "GODREJPROP.NS", "OBEROIRLTY.NS",
+    "PRESTIGE.NS", "PHOENIXLTD.NS", "BRIGADE.NS", "SOBHA.NS",
+    "MAHLIFE.NS", "ANANTRAJ.NS",
+  ],
+  Retail: [
+    "TITAN.NS", "TRENT.NS", "DMART.NS", "NYKAA.NS", "KALYANKJIL.NS",
+    "ABFRL.NS", "VMART.NS", "SHOPERSTOP.NS", "PAGEIND.NS",
+    "RELAXO.NS", "BATAINDIA.NS",
+  ],
+  Telecom: [
+    "BHARTIARTL.NS", "INDUSTOWER.NS", "IDEA.NS", "TATACOMM.NS",
+    "TEJASNET.NS", "HFCL.NS",
+  ],
 };
 
 /* ─── Cache (keyed by sector|period) ─── */
@@ -233,6 +299,11 @@ export async function GET(request) {
       period,
       benchmarkPctChg: benchChg != null ? parseFloat(benchChg.toFixed(2)) : null,
       stocks: [...valid, ...errored],
+      counts: {
+        total: stocks.length,
+        loaded: valid.length,
+        errored: errored.length,
+      },
       fromCache: false,
     };
     setCached(key, payload);

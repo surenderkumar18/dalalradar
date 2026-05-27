@@ -103,6 +103,7 @@ const DateTick = React.memo(
     onTickLeave,
     onTickRegister,
     dateLabelRefs,
+    viewportScale,
   }) {
     const date = Number(payload.value);
 
@@ -130,7 +131,23 @@ const DateTick = React.memo(
           transform="rotate(-45)"
           textAnchor="end"
           fill={isActive ? "#FFD700" : color}
-          fontSize={isActive ? 14 : 12}
+          fontSize={
+            viewportScale < 0.55
+              ? isActive
+                ? 9
+                : 7
+              : viewportScale < 0.75
+                ? isActive
+                  ? 11
+                  : 9
+                : viewportScale < 1
+                  ? isActive
+                    ? 13
+                    : 11
+                  : isActive
+                    ? 14
+                    : 12
+          }
           fontWeight={isActive ? 800 : 400}
         >
           {new Date(date).toLocaleDateString("en-IN", {
@@ -428,21 +445,36 @@ function TimelineBubble({
   const [viewportScale, setViewportScale] = useState(1);
 
   useEffect(() => {
-    function updateScale() {
+    let rafId = null;
+
+    function compute() {
       const w = window.innerWidth;
-      if (w < 480)
-        setViewportScale(0.3); // tiny phone
-      else if (w < 768)
-        setViewportScale(0.4); // phone
-      else if (w < 1024)
-        setViewportScale(0.5); // tablet/landscape phone ← was 0.75
-      else if (w < 1280)
-        setViewportScale(0.75); // small laptop
-      else setViewportScale(1); // desktop
+      if (w < 600) return 0.4; // XS mobile (Galaxy S20 class — India's #1 at 14.1%)
+      if (w < 768) return 0.5; // Mobile
+      if (w < 1024) return 0.58; // Tablet portrait (iPad)
+      if (w < 1280) return 0.62; // Small laptop
+      if (w < 1440) return 0.68; // Mid laptop (1366×768 — India's #1 desktop at 8.28%)
+      if (w < 1600) return 0.72; // Large laptop
+      if (w < 1920) return 0.8; // Desktop
+      if (w < 2240) return 0.7; // 1920×1080 desktop (pro traders, 5.7%)
+      return 1; // Ultra-wide
     }
+
+    function updateScale() {
+      setViewportScale(compute());
+    }
+
+    function onResize() {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateScale);
+    }
+
     updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
+    window.addEventListener("resize", onResize);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -827,12 +859,11 @@ function TimelineBubble({
           currentActiveDate && Number(currentActiveDate) === Number(payload.x);
 
         const isDateDimmed =
-  currentActiveDate &&
-  Number(currentActiveDate) !== Number(payload.x);  
+          currentActiveDate && Number(currentActiveDate) !== Number(payload.x);
 
         const isExpiryDimmed =
-  activeExpiryRef.current &&
-  expiryGroupMap[Number(payload.x)] !== activeExpiryRef.current.index;
+          activeExpiryRef.current &&
+          expiryGroupMap[Number(payload.x)] !== activeExpiryRef.current.index;
 
         const isRecent = Math.abs(payload.x - latestDate) < 1000;
 
@@ -905,14 +936,14 @@ function TimelineBubble({
                 r={r * 1.55}
                 fill={sigStyle.glowColor || sigStyle.fill}
                 opacity={
-  (isDateDimmed || isExpiryDimmed)
-    ? 0.02
-    : !activeCategoryRef.current
-      ? 0.18
-      : payload.stock === activeCategoryRef.current
-        ? 0.18
-        : 0.08
-}
+                  isDateDimmed || isExpiryDimmed
+                    ? 0.02
+                    : !activeCategoryRef.current
+                      ? 0.18
+                      : payload.stock === activeCategoryRef.current
+                        ? 0.18
+                        : 0.08
+                }
                 style={{ pointerEvents: "none" }}
               />
             )}
@@ -927,14 +958,14 @@ function TimelineBubble({
                 stroke={sigStyle.fill}
                 strokeWidth={2}
                 opacity={
-  (isDateDimmed || isExpiryDimmed)
-    ? 0.03
-    : !activeCategoryRef.current
-      ? 0.7
-      : payload.stock === activeCategoryRef.current
-        ? 0.7
-        : 0.08
-}
+                  isDateDimmed || isExpiryDimmed
+                    ? 0.03
+                    : !activeCategoryRef.current
+                      ? 0.7
+                      : payload.stock === activeCategoryRef.current
+                        ? 0.7
+                        : 0.08
+                }
                 style={{ pointerEvents: "none" }}
               />
             )}
@@ -946,15 +977,15 @@ function TimelineBubble({
               r={r}
               ref={bubbleRefCallback}
               fill={sigStyle.fill}
-             opacity={
-  (isDateDimmed || isExpiryDimmed)
-    ? 0.05
-    : !activeCategoryRef.current
-      ? finalOpacity
-      : payload.stock === activeCategoryRef.current
-        ? finalOpacity
-        : 0.08
-}
+              opacity={
+                isDateDimmed || isExpiryDimmed
+                  ? 0.05
+                  : !activeCategoryRef.current
+                    ? finalOpacity
+                    : payload.stock === activeCategoryRef.current
+                      ? finalOpacity
+                      : 0.08
+              }
               data-id={bubbleKey}
               data-x={payload.x}
               data-weak="0"
@@ -983,13 +1014,14 @@ function TimelineBubble({
                   pointerEvents: "none",
                   userSelect: "none",
                   textShadow: "0 0 3px rgba(0,0,0,0.9)",
-                  opacity: (isDateDimmed || isExpiryDimmed)
-  ? 0.04
-  : !activeCategoryRef.current
-    ? 1
-    : payload.stock === activeCategoryRef.current
-      ? 1
-      : 0.08,
+                  opacity:
+                    isDateDimmed || isExpiryDimmed
+                      ? 0.04
+                      : !activeCategoryRef.current
+                        ? 1
+                        : payload.stock === activeCategoryRef.current
+                          ? 1
+                          : 0.08,
                 }}
               >
                 {sigStyle.icon}
@@ -1043,12 +1075,11 @@ function TimelineBubble({
           currentActiveDate && Number(currentActiveDate) === Number(payload.x);
 
         const isDateDimmed =
-  currentActiveDate &&
-  Number(currentActiveDate) !== Number(payload.x);  
+          currentActiveDate && Number(currentActiveDate) !== Number(payload.x);
 
-  const isExpiryDimmed =
-  activeExpiryRef.current &&
-  expiryGroupMap[Number(payload.x)] !== activeExpiryRef.current.index;
+        const isExpiryDimmed =
+          activeExpiryRef.current &&
+          expiryGroupMap[Number(payload.x)] !== activeExpiryRef.current.index;
 
         const isRecent = Math.abs(payload.x - latestDate) < 1000;
 
@@ -1113,8 +1144,8 @@ function TimelineBubble({
 
         const computeOpacity = () => {
           if (currentActiveDate) {
-  return isActiveDate ? 1 : 0.06;
-}
+            return isActiveDate ? 1 : 0.06;
+          }
 
           if (activeCategoryRef.current) {
             return key === activeCategoryRef.current ? 0.8 : 0.08;
@@ -1202,7 +1233,7 @@ function TimelineBubble({
               data-weak={isWeak ? "1" : "0"}
               stroke={isWeak ? fill : "none"}
               strokeWidth={isWeak ? 1.2 : 0}
-              opacity={(isDateDimmed || isExpiryDimmed) ? 0.05 : finalOpacity}
+              opacity={isDateDimmed || isExpiryDimmed ? 0.05 : finalOpacity}
             />
             {/* 🔥 HIT AREA — bigger transparent circle, catches ALL hover */}
             <circle
@@ -1372,6 +1403,7 @@ function TimelineBubble({
     <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
       <div
         ref={chartRef}
+        data-tour="bubble"
         style={{ position: "relative", width: "100%", height: "100%" }}
       >
         <ResponsiveContainer width="100%" height="100%">
@@ -1554,6 +1586,7 @@ function TimelineBubble({
               tick={(props) => (
                 <DateTick
                   {...props}
+                  viewportScale={viewportScale}
                   expiryColorMap={expiryColorMap}
                   activeDate={activeDate}
                   onTickClick={handleTickClick}
@@ -1674,10 +1707,11 @@ function TimelineBubble({
 
                       const isActive = activeCategory === sec;
                       const isDim = activeCategory && activeCategory !== sec;
-
+                      const isFirstSector = Math.floor(payload.value) === 0;
                       return (
                         <g
                           className="axis-label-group"
+                          data-tour={isFirstSector ? "sector" : undefined} 
                           onClick={() => {
                             if (mode === "sector") {
                               setActiveCategory((prev) =>

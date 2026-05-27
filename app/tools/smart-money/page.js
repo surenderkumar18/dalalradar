@@ -26,11 +26,15 @@ import { mergeOiIntoRollover } from "@/app/utils/mergeOiIntoRollover";
 import { buildSectorTimeline } from "@/app/utils/buildSectorTimeline";
 import { loadMarketCaps } from "@/app/utils/loadMarketCaps";
 
-import Sidebar from "../../../components/Sidebar";
+//import Sidebar from "../../../components/Sidebar";
 import TimelineBubble from "./components/TimelineBubble";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+
+// 🔥 NEW: shared brand loader
+import { RadarLoaderScreen } from "@/app/components/RadarLoader";
+import SmartMoneyTour from "./components/SmartMoneyTour";
 
 import {
   buildBubbleFromTimeline,
@@ -51,9 +55,10 @@ export default function Page() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center h-screen text-gray-400">
-          Loading market data...
-        </div>
+        <RadarLoaderScreen
+          label="Loading Market Data"
+          sublabel="Building the smart money radar…"
+        />
       }
     >
       <BubbleChartContent />
@@ -686,9 +691,10 @@ function BubbleChartContent() {
 
   if (!rolloverDataMap) {
     return (
-      <div className="flex items-center justify-center h-screen text-gray-400">
-        Loading market data...
-      </div>
+      <RadarLoaderScreen
+        label="Loading Market Data"
+        sublabel="Merging rollover + open interest…"
+      />
     );
   }
 
@@ -822,6 +828,7 @@ function BubbleChartContent() {
         </div>
       </div>
       <SiteFooter />
+      <SmartMoneyTour />
     </div>
   );
 }

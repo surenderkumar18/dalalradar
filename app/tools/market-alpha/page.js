@@ -21,6 +21,7 @@ import {
 
 import DashboardHeader from "@/app/components/DashboardHeader";
 import SiteFooter from "@/components/SiteFooter";
+import RadarLoader, { RadarLoaderScreen } from "@/app/components/RadarLoader";
 
 /* ════════════════════════════════════════════════════════════
    COLOR PALETTES
@@ -102,9 +103,12 @@ function SectorDetail({ sector, period, isDark, subText, periodLabel }) {
 
   if (loading) {
     return (
-      <div className={`px-3 py-4 flex items-center justify-center gap-2 text-xs ${subText}`}>
-        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-        Loading {sector} stocks…
+      <div
+        className={`px-3 py-6 ${
+          isDark ? "bg-slate-950/60" : "bg-slate-100/70"
+        }`}
+      >
+        <RadarLoader size="sm" label={`Scanning ${sector}`} />
       </div>
     );
   }
@@ -127,9 +131,15 @@ function SectorDetail({ sector, period, isDark, subText, periodLabel }) {
   return (
     <div className={`px-2 py-2 ${isDark ? "bg-slate-950/60" : "bg-slate-100/70"}`}>
       {/* Sub-header */}
-      <div className="flex items-center justify-between px-2 py-1.5 mb-1">
-        <div className={`text-[10px] uppercase tracking-wider font-bold ${subText}`}>
-          Stocks · {periodLabel}
+      <div className="flex items-center justify-between px-2 py-1.5 mb-1 flex-wrap gap-2">
+        <div className={`text-[10px] uppercase tracking-wider font-bold ${subText} flex items-center gap-1.5`}>
+          <span>All F&O stocks · {periodLabel}</span>
+          {data.counts && (
+            <span className={`text-[9px] font-mono normal-case font-normal opacity-70`}>
+              ({data.counts.loaded}/{data.counts.total} loaded
+              {data.counts.errored > 0 ? ` · ${data.counts.errored} unavailable` : ""})
+            </span>
+          )}
         </div>
         {benchChg != null && (
           <div className={`text-[10px] font-mono ${subText}`}>
@@ -154,7 +164,7 @@ function SectorDetail({ sector, period, isDark, subText, periodLabel }) {
       </div>
 
       {/* Stock rows */}
-      <div className="space-y-0.5">
+      <div className="space-y-0.5 max-h-[420px] overflow-y-auto custom-scroll pr-1 -mr-1">
         {stocks.map((s) => {
           if (s.status === "no-data") {
             return (
@@ -363,7 +373,10 @@ export default function MarketAlphaPage() {
     });
     if (lo === Infinity) return [80, 120];
     const pad = Math.max(2, (hi - lo) * 0.08);
-    return [Math.max(50, lo - pad), hi + pad];
+    // Round to nice integers so Y-axis ticks are clean (80, 90, 100 — not 86.2264)
+    const loRounded = Math.max(50, Math.floor((lo - pad) / 5) * 5);
+    const hiRounded = Math.ceil((hi + pad) / 5) * 5;
+    return [loRounded, hiRounded];
   }, [chartData, displayedSectors]);
 
   const formatDateShort = (d) => {
@@ -400,20 +413,10 @@ export default function MarketAlphaPage() {
   /* ─── Loading state ─── */
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"}`}>
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative h-16 w-16">
-            <div className="absolute inset-0 rounded-full border-4 border-cyan-500/20"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-cyan-500 animate-spin"></div>
-          </div>
-          <div className="font-mono text-sm tracking-wider text-cyan-400">
-            📡 Loading sector ranking...
-          </div>
-          <div className="text-xs text-slate-500">
-            First load: ~20s. Cached: instant.
-          </div>
-        </div>
-      </div>
+      <RadarLoaderScreen
+        label="Scanning Dalal Street"
+        sublabel="First load: ~20s · cached: instant"
+      />
     );
   }
 
@@ -699,11 +702,11 @@ export default function MarketAlphaPage() {
           <main className={`xl:col-span-8 p-5 border ${cardBg} ${cardBorder}`}>
             <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
               <div>
-                <h2 className="text-lg font-bold flex items-center gap-2 mb-0" style={{marginBottom: 0}}>
+               <h2 className="text-lg font-bold flex items-center gap-2" style={{marginBottom: 0}}>
                   <Activity className="w-5 h-5 text-cyan-500" />
                   Relative Strength vs Nifty (Base = 100)
                 </h2>
-                <p className={`text-xs mt-1 ${subText}`}  style={{marginBottom: 0}}>
+                <p className={`text-xs mt-1 ${subText}`} style={{marginBottom: 0, marginLeft: 24}}>
                   Values &gt; 100 = outperforming Nifty • Showing {displayedSectors.length} of {allSorted.length} sectors
                 </p>
                 {(period === "1wk" || period === "15d") && (
@@ -729,14 +732,22 @@ export default function MarketAlphaPage() {
               </div>
             </div>
 
-            <div className="h-[720px] w-full">
+            <div className="h-[700px] 2xl:h-[700px] [@media(min-width:1980px)]:h-[892px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData} margin={{ top: 12, right: 110, left: -10, bottom: 8 }}>
+                <LineChart data={chartData} margin={{ top: 12, right: 110, left: 0, bottom: 8 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                   <ReferenceArea y1={110} y2={yDomain[1]} fill="#10b981" fillOpacity={isDark ? 0.04 : 0.08} />
                   <ReferenceArea y1={yDomain[0]} y2={90} fill="#f43f5e" fillOpacity={isDark ? 0.04 : 0.08} />
                   <XAxis dataKey="date" stroke={axisStroke} fontSize={10} tickLine={false} tickFormatter={formatDateShort} minTickGap={40} />
-                  <YAxis stroke={axisStroke} fontSize={10} tickLine={false} domain={yDomain} width={45} />
+                  <YAxis
+                    stroke={axisStroke}
+                    fontSize={10}
+                    tickLine={false}
+                    domain={yDomain}
+                    width={36}
+                    allowDecimals={false}
+                    tickFormatter={(v) => Math.round(v).toString()}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: isDark ? "rgba(15,23,42,0.95)" : "rgba(255,255,255,0.95)",
@@ -829,7 +840,7 @@ export default function MarketAlphaPage() {
               <h3 className="text-lg font-bold flex items-center gap-2">
                 <Waves className="text-purple-500 w-5 h-5" />
                 Whale Tracker
-                <span className={`text-xs font-normal ${subText}`}>
+                <span className={`text-xs font-normal ${subText}`} style={{marginBottom: 0,}}>
                   — Scans top 5 sectors for institutional volume
                 </span>
               </h3>

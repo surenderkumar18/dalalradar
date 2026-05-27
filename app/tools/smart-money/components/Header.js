@@ -154,6 +154,7 @@ export default function Header({
             >
               <div className="search-wrapper">
                 <div
+                  data-tour="search"
                   style={{
                     position: "relative",
                     zIndex: 200,
@@ -242,24 +243,26 @@ export default function Header({
           </PremiumFeature>
         </div>
 
-        {/* 🔘 Past Days */}
-        {/* 🔘 Past Days */}
-        <CustomDropdown
-          label="Past Days"
-          width={150}
-          value={pastDays}
-          onChange={setPastDays}
-          options={[
-            { value: 30, label: "30 Days" },
-            { value: 45, label: "45 Days" },
-            { value: 60, label: "60 Days" },
-            { value: 75, label: "75 Days" },
-            { value: 90, label: "90 Days" },
-            { value: 120, label: "120 Days", premium: true }, // 🔒 Premium
-            { value: 180, label: "180 Days", premium: true }, // 🔒 Premium
-            { value: null, label: "All Data", premium: true }, // 🔒 Premium
-          ]}
-        />
+        {/* 🔘 Past Days — wrapped so data-tour reliably reaches the DOM
+            (CustomDropdown may not forward arbitrary props to its root) */}
+        <span data-tour="period" style={{ display: "inline-block" }}>
+          <CustomDropdown
+            label="Past Days"
+            width={150}
+            value={pastDays}
+            onChange={setPastDays}
+            options={[
+              { value: 30, label: "30 Days" },
+              { value: 45, label: "45 Days" },
+              { value: 60, label: "60 Days" },
+              { value: 75, label: "75 Days" },
+              { value: 90, label: "90 Days" },
+              { value: 120, label: "120 Days", premium: true }, // 🔒 Premium
+              { value: 180, label: "180 Days", premium: true }, // 🔒 Premium
+              { value: null, label: "All Data", premium: true }, // 🔒 Premium
+            ]}
+          />
+        </span>
         {canShowOnDevice("BUBBLE_POSITION", screenWidth) && (
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <CustomDropdown

@@ -251,6 +251,7 @@ function SignalEnginePanel({ d }) {
       </div>
 
       {/* CONTEXT */}
+      
       <div
         style={{
           background: "rgba(255,255,255,0.025)",
@@ -262,6 +263,7 @@ function SignalEnginePanel({ d }) {
           lineHeight: 1.7,
         }}
       >
+         {/*
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span style={{ color: "#94a3b8" }}>60-day structure</span>
           <b style={{ color: bigTrend.color }}>{bigTrend.text}</b>
@@ -304,7 +306,7 @@ function SignalEnginePanel({ d }) {
             </b>
           </div>
         )}
-
+          */}
         {/* 🆕 v3.3: Prior damage indicator */}
         {sig.priorDamaged && (
           <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -483,17 +485,19 @@ function SignalEnginePanel({ d }) {
               margin: 0,
               padding: 0,
               listStyle: "none",
-              fontSize: 12,
-              lineHeight: 1.6,
             }}
           >
             {sig.reasons.map((reason, i) => (
               <li
                 key={i}
                 style={{
-                  paddingLeft: 12,
                   position: "relative",
                   color: "#cbd5f5",
+                  fontSize: 12,
+                  margin: 0,
+                  padding: 0,
+                  paddingLeft: 12,
+                  lineHeight: 1.4,
                 }}
               >
                 <span
@@ -915,6 +919,8 @@ const CustomTooltip = React.memo(function CustomTooltip({
               </span>
             </div>
           )}
+          
+          {/** 
           {isStock && (
             <div style={{ fontSize: 16 }}>
               Lots:{" "}
@@ -955,6 +961,7 @@ const CustomTooltip = React.memo(function CustomTooltip({
               </span>
             </div>
           )}
+            */}
         </div>
         {isStock && (
           <div
