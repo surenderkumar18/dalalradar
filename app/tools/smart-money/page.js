@@ -82,22 +82,29 @@ function BubbleChartContent() {
   const [mode, setMode] = useState(initialSector ? "stock" : "sector");
   const [selectedSector, _setSelectedSector] = useState(initialSector);
 
-  const setSelectedSector = useCallback(
-    (newSector) => {
-      _setSelectedSector(newSector);
-      const params = new URLSearchParams(window.location.search);
-      if (newSector) {
-        params.set("sector", newSector);
-      } else {
-        params.delete("sector");
-      }
-      const queryString = params.toString();
-      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
-        scroll: false,
-      });
-    },
-    [pathname, router],
-  );
+  // Replace the existing wrapped setSelectedSector with the plain setter…
+// (Keep `_setSelectedSector` as the React state setter, but call the public
+// setter `setSelectedSector` everywhere — it just updates state synchronously.)
+
+const setSelectedSector = _setSelectedSector;   // 🔧 plain setter, no router
+
+// 🔧 Sync URL when selectedSector changes — runs AFTER React commits state,
+// so it doesn't race with other state updates.
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  const params = new URLSearchParams(window.location.search);
+  if (selectedSector) {
+    params.set("sector", selectedSector);
+  } else {
+    params.delete("sector");
+  }
+  const queryString = params.toString();
+  const target = queryString ? `${pathname}?${queryString}` : pathname;
+  // Avoid pushing the same URL repeatedly (e.g. initial mount).
+  if (window.location.pathname + window.location.search !== target) {
+    router.replace(target, { scroll: false });
+  }
+}, [selectedSector, pathname, router]);
 
   const [timeline, setTimeline] = useState([]);
 
