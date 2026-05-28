@@ -2,49 +2,81 @@
 //
 // 🎯 FEATURE ACCESS — Check if a feature is available to the user.
 //
+// THREE ROLES:
+//   admin    → sees all BUILT features (free + premium). Bypasses the
+//              premium gate, but NOT the global kill switch (so unbuilt
+//              stubs like HEATMAP_TOOL stay hidden and can't crash).
+//   premium  → sees free + premium features.
+//   general  → sees free features only.
+//
 // USAGE:
-//   import { hasFeature } from "@/utils/featureAccess";
+//   import { hasFeature, ROLES } from "@/utils/featureAccess";
+//   if (hasFeature("STOCK_SEARCH", role)) { ... }
 //
-//   if (hasFeature("STOCK_SEARCH", isPremiumUser)) {
-//     // Show the feature
-//   }
+//   // Back-compat: a boolean still works —
+//   //   true  → treated as premium
+//   //   false → treated as general
+//   if (hasFeature("STOCK_SEARCH", isPremiumUser)) { ... }
 //
-// LOGIC:
-//   1. Is feature globally enabled? → if not, hide for everyone
-//   2. Is it premium-only? → if yes, only show to premium users
-//   3. Otherwise → show to everyone
+// LOGIC (Option A — admin bypasses premium gate, NOT kill switch):
+//   1. Is feature globally enabled? → if not, hide for EVERYONE (incl. admin)
+//   2. Is the user an admin?        → if yes, show (all built features)
+//   3. Is it premium-only?          → if yes, only premium users
+//   4. Otherwise (free + enabled)   → show to everyone
 //
 
 import { FEATURE_FLAGS, PREMIUM_FEATURES } from "@/config/featureFlags";
 
-export function hasFeature(featureKey, isPremiumUser = false) {
+// Role constants — import these instead of using magic strings.
+export const ROLES = {
+  ADMIN: "admin",
+  PREMIUM: "premium",
+  GENERAL: "general",
+};
+
+// Accept either a role string or a legacy boolean (isPremiumUser).
+function normalizeRole(roleOrBool) {
+  if (roleOrBool === true) return ROLES.PREMIUM; // old isPremiumUser={true}
+  if (roleOrBool === false) return ROLES.GENERAL; // old isPremiumUser={false}
+  return roleOrBool || ROLES.GENERAL;
+}
+
+export function hasFeature(featureKey, roleOrBool = ROLES.GENERAL) {
+  const role = normalizeRole(roleOrBool);
+
   // Step 1: Is the feature globally enabled?
+  // ⛔ Applies to ADMINS too — never render an unbuilt/killed feature.
   if (!FEATURE_FLAGS[featureKey]) {
-    return false; // killed globally — hide from everyone
+    return false;
   }
 
-  // Step 2: Is this a premium-only feature?
+  // Step 2: 🔑 ADMIN — sees all BUILT features (free + premium).
+  if (role === ROLES.ADMIN) {
+    return true;
+  }
+
+  // Step 3: Is this a premium-only feature?
   if (PREMIUM_FEATURES[featureKey]) {
-    return isPremiumUser; // only premium users can see it
+    return role === ROLES.PREMIUM;
   }
 
-  // Step 3: Free feature, globally enabled → show to everyone
+  // Step 4: Free feature, globally enabled → show to everyone.
   return true;
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────
 
-/**
- * Check if feature is premium-locked (visible but paywalled).
- * Useful for showing "🔒 Premium" badges on disabled UI.
- */
+/** True if feature is premium-locked (visible but paywalled). */
 export function isPremiumOnly(featureKey) {
   return Boolean(PREMIUM_FEATURES[featureKey]);
 }
 
-/**
- * Check if feature exists globally (regardless of user tier).
- */
+/** True if feature exists globally (regardless of user tier). */
 export function isFeatureLive(featureKey) {
   return Boolean(FEATURE_FLAGS[featureKey]);
+}
+
+/** True if the given role/bool is an admin. */
+export function isAdminRole(roleOrBool) {
+  return normalizeRole(roleOrBool) === ROLES.ADMIN;
 }

@@ -9,7 +9,7 @@
 //  Place this file alongside page.js at:
 //    app/tools/smart-money/layout.js
 // ════════════════════════════════════════════════════════════
-
+import Providers from "./Providers";  
 export const metadata = {
   title: "Smart Money Radar — DalalRadar",
   description:
@@ -61,5 +61,5 @@ export const metadata = {
 };
 
 export default function SmartMoneyLayout({ children }) {
-  return children;
+  return <Providers>{children}</Providers>;  
 }

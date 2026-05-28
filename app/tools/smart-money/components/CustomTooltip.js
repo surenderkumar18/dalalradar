@@ -16,6 +16,66 @@ const MemoMiniRolloverBars = React.memo(MiniRolloverBars);
 const MemoOIPriceChart = React.memo(OIPriceChart);
 
 // =====================================================================
+// 🎨 SHARED STYLE TOKENS — edit ONCE, applies everywhere
+// =====================================================================
+const SIZE = {
+  row: 12, // data rows (was inline `{ fontSize: 16 }` ~24×)
+  header: 18, // stock/sector name + date
+  headerHeight: 50,
+};
+
+const COL = {
+  up: "#22c55e",
+  down: "#ef4444",
+  blue: "#60a5fa",
+  gold: "#facc15",
+  purple: "#c084fc",
+  cyan: "#1bbbd7",
+  muted: "#69696b",
+  text: "#e5e7eb",
+  violet: "#a78bfa",
+};
+
+// Pre-built style objects (allocated once, not per render)
+const ROW = { fontSize: SIZE.row };
+const ROW_MUTED = { fontSize: SIZE.row, fontWeight: 500 };
+const HEADER_BASE = {
+  fontSize: SIZE.header,
+  fontWeight: 600,
+  height: SIZE.headerHeight,
+};
+const HEADER_STOCK = { ...HEADER_BASE, color: COL.purple };
+const HEADER_DATE = { ...HEADER_BASE, color: COL.cyan };
+
+function fmtDate(x) {
+  return new Date(x).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+const upDown = (v) => (v > 0 ? COL.up : COL.down);
+
+// =====================================================================
+// 🧩 Row — one "Label: value" line. Controls font + layout of EVERY
+// data row from a single place.
+//
+//   <Row label="Price" value={d.close} color={COL.up} />     → bold colored
+//   <Row label="Lots" value={...} muted />                   → gray, not bold
+//   <Row label="Change" value="…" color={fill} style={ROW_MUTED} />
+// =====================================================================
+function Row({ label, value, color, muted = false, bold = true, style }) {
+  const valueColor = muted ? COL.muted : color || COL.text;
+  const ValueTag = bold && !muted ? "b" : "span";
+  return (
+    <div style={style ? { ...ROW, ...style } : ROW}>
+      {label}: <ValueTag style={{ color: valueColor }}>{value}</ValueTag>
+    </div>
+  );
+}
+
+// =====================================================================
 // 🎯 SIGNAL ENGINE PANEL (v3.3 — full BUY/SELL symmetry)
 // =====================================================================
 
@@ -101,6 +161,36 @@ function formatPatternName(pattern) {
     .join(" ");
 }
 
+// space-between label/value line used by signal + sector panels
+function SpaceRow({ label, children }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <span style={{ color: "#94a3b8" }}>{label}</span>
+      {children}
+    </div>
+  );
+}
+
+// reusable flag chip
+function Flag({ children, bg, color, border, title }) {
+  return (
+    <span
+      title={title}
+      style={{
+        fontSize: 10,
+        fontWeight: 700,
+        padding: "2px 6px",
+        borderRadius: 3,
+        background: bg,
+        color,
+        border: `1px solid ${border}`,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
 function SignalEnginePanel({ d }) {
   const sig = d.bubbleSignal;
   if (!sig) return null;
@@ -114,6 +204,7 @@ function SignalEnginePanel({ d }) {
 
   const strengthPct = Math.round((sig.strength || 0) * 100);
   const isStrict = sig.tier === "strict";
+  const isBuy = sig.type === "BUY";
 
   return (
     <div
@@ -154,7 +245,7 @@ function SignalEnginePanel({ d }) {
             >
               {cfg.label}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#e5e7eb" }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: COL.text }}>
               {formatPatternName(sig.pattern)}
             </div>
             {patternDesc && (
@@ -179,7 +270,7 @@ function SignalEnginePanel({ d }) {
             fontSize: 10,
             fontWeight: 800,
             letterSpacing: 0.6,
-            color: isStrict ? "#0a0a0a" : "#e5e7eb",
+            color: isStrict ? "#0a0a0a" : COL.text,
             background: isStrict ? cfg.primary : "rgba(255,255,255,0.08)",
             border: isStrict ? "none" : "1px solid rgba(255,255,255,0.15)",
           }}
@@ -251,7 +342,6 @@ function SignalEnginePanel({ d }) {
       </div>
 
       {/* CONTEXT */}
-      
       <div
         style={{
           background: "rgba(255,255,255,0.025)",
@@ -263,40 +353,35 @@ function SignalEnginePanel({ d }) {
           lineHeight: 1.7,
         }}
       >
-         {/*
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>60-day structure</span>
+        <SpaceRow label="60-day structure">
           <b style={{ color: bigTrend.color }}>{bigTrend.text}</b>
-        </div>
+        </SpaceRow>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>30-day trend</span>
+        <SpaceRow label="30-day trend">
           <b style={{ color: trend.color }}>{trend.text}</b>
-        </div>
+        </SpaceRow>
 
         {sig.obvTrend !== undefined && (
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span style={{ color: "#94a3b8" }}>OBV trend</span>
+          <SpaceRow label="OBV trend">
             <b
               style={{
                 color:
                   sig.obvTrend > 0.1
-                    ? "#22c55e"
+                    ? COL.up
                     : sig.obvTrend < -0.1
-                      ? "#ef4444"
+                      ? COL.down
                       : "#94a3b8",
               }}
             >
               {sig.obvTrend > 0 ? "+" : ""}
               {sig.obvTrend.toFixed(2)}
             </b>
-          </div>
+          </SpaceRow>
         )}
 
         {sig.patternCount !== undefined && (
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span style={{ color: "#94a3b8" }}>Patterns matched</span>
-            <b style={{ color: sig.confluence ? "#a78bfa" : "#cbd5f5" }}>
+          <SpaceRow label="Patterns matched">
+            <b style={{ color: sig.confluence ? COL.violet : "#cbd5f5" }}>
               {sig.patternCount}
               {sig.confluence && (
                 <span style={{ marginLeft: 6, fontSize: 10 }}>
@@ -304,15 +389,14 @@ function SignalEnginePanel({ d }) {
                 </span>
               )}
             </b>
-          </div>
+          </SpaceRow>
         )}
-          */}
+
         {/* 🆕 v3.3: Prior damage indicator */}
         {sig.priorDamaged && (
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span style={{ color: "#94a3b8" }}>Prior damage</span>
-            <b style={{ color: "#a78bfa" }}>⚠️ Yes (recovered)</b>
-          </div>
+          <SpaceRow label="Prior damage">
+            <b style={{ color: COL.violet }}>⚠️ Yes (recovered)</b>
+          </SpaceRow>
         )}
       </div>
 
@@ -332,136 +416,81 @@ function SignalEnginePanel({ d }) {
           }}
         >
           {sig.trendAligned && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 6px",
-                borderRadius: 3,
-                background:
-                  sig.type === "BUY"
-                    ? "rgba(34,197,94,0.15)"
-                    : "rgba(239,68,68,0.15)",
-                color: sig.type === "BUY" ? "#22c55e" : "#ef4444",
-                border: `1px solid ${
-                  sig.type === "BUY"
-                    ? "rgba(34,197,94,0.3)"
-                    : "rgba(239,68,68,0.3)"
-                }`,
-              }}
+            <Flag
+              bg={isBuy ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)"}
+              color={isBuy ? "#22c55e" : "#ef4444"}
+              border={isBuy ? "rgba(34,197,94,0.3)" : "rgba(239,68,68,0.3)"}
             >
               ✅ TREND ALIGNED
-            </span>
+            </Flag>
           )}
           {sig.trendConflict && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 6px",
-                borderRadius: 3,
-                background: "rgba(239,68,68,0.15)",
-                color: "#ef4444",
-                border: "1px solid rgba(239,68,68,0.3)",
-              }}
+            <Flag
+              bg="rgba(239,68,68,0.15)"
+              color="#ef4444"
+              border="rgba(239,68,68,0.3)"
             >
               ⚠️ TREND CONFLICT
-            </span>
+            </Flag>
           )}
           {sig.obvWarning && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 6px",
-                borderRadius: 3,
-                background: "rgba(234,179,8,0.15)",
-                color: "#eab308",
-                border: "1px solid rgba(234,179,8,0.3)",
-              }}
+            <Flag
+              bg="rgba(234,179,8,0.15)"
+              color="#eab308"
+              border="rgba(234,179,8,0.3)"
               title={sig.obvWarning}
             >
               📊 OBV DIVERGED
-            </span>
+            </Flag>
           )}
           {sig.upgradeReason === "confluence" && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 6px",
-                borderRadius: 3,
-                background: "rgba(167,139,250,0.15)",
-                color: "#a78bfa",
-                border: "1px solid rgba(167,139,250,0.3)",
-              }}
+            <Flag
+              bg="rgba(167,139,250,0.15)"
+              color="#a78bfa"
+              border="rgba(167,139,250,0.3)"
             >
               ⬆ UPGRADED (CONFLUENCE)
-            </span>
+            </Flag>
           )}
           {sig.upgradeReason === "recovery_continuation" && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 6px",
-                borderRadius: 3,
-                background: "rgba(167,139,250,0.15)",
-                color: "#a78bfa",
-                border: "1px solid rgba(167,139,250,0.3)",
-              }}
+            <Flag
+              bg="rgba(167,139,250,0.15)"
+              color="#a78bfa"
+              border="rgba(167,139,250,0.3)"
             >
               ⬆ UPGRADED (RECOVERY)
-            </span>
+            </Flag>
           )}
           {/* 🆕 v3.3: Recovery mode flag */}
           {sig.recoveryMode && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 6px",
-                borderRadius: 3,
-                background: "rgba(34,197,94,0.15)",
-                color: "#22c55e",
-                border: "1px solid rgba(34,197,94,0.3)",
-              }}
+            <Flag
+              bg="rgba(34,197,94,0.15)"
+              color="#22c55e"
+              border="rgba(34,197,94,0.3)"
               title="Stock recovered from prior damage"
             >
               🚀 RECOVERY MODE
-            </span>
+            </Flag>
           )}
           {sig.damagedStructure === "severe" && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 6px",
-                borderRadius: 3,
-                background: "rgba(239,68,68,0.2)",
-                color: "#fca5a5",
-                border: "1px solid rgba(239,68,68,0.5)",
-              }}
+            <Flag
+              bg="rgba(239,68,68,0.2)"
+              color="#fca5a5"
+              border="rgba(239,68,68,0.5)"
               title="Stock is severely damaged (60d structure)"
             >
               🚨 DAMAGED STRUCTURE
-            </span>
+            </Flag>
           )}
           {sig.damagedStructure === "moderate" && (
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 6px",
-                borderRadius: 3,
-                background: "rgba(245,158,11,0.15)",
-                color: "#f59e0b",
-                border: "1px solid rgba(245,158,11,0.3)",
-              }}
+            <Flag
+              bg="rgba(245,158,11,0.15)"
+              color="#f59e0b"
+              border="rgba(245,158,11,0.3)"
               title="Stock structure is damaged (60d weakness)"
             >
               🩹 RECOVERY MODE
-            </span>
+            </Flag>
           )}
         </div>
       )}
@@ -480,13 +509,7 @@ function SignalEnginePanel({ d }) {
           >
             WHY IT FIRED
           </div>
-          <ul
-            style={{
-              margin: 0,
-              padding: 0,
-              listStyle: "none",
-            }}
-          >
+          <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
             {sig.reasons.map((reason, i) => (
               <li
                 key={i}
@@ -501,11 +524,7 @@ function SignalEnginePanel({ d }) {
                 }}
               >
                 <span
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    color: cfg.primary,
-                  }}
+                  style={{ position: "absolute", left: 0, color: cfg.primary }}
                 >
                   ›
                 </span>
@@ -520,7 +539,7 @@ function SignalEnginePanel({ d }) {
 }
 
 // =====================================================================
-// 🔥 SECTOR ROTATION PANEL (unchanged)
+// 🔥 SECTOR ROTATION PANEL (unchanged logic)
 // =====================================================================
 
 function getRotationLabel(score) {
@@ -565,6 +584,9 @@ function SectorRotationPanel({ d }) {
   const breadthLabel = getBreadthLabel(breadth);
   const relStrength = getRelativeStrengthLabel(d.relativePrice ?? 0);
 
+  const mf = d.moneyFlowScore ?? 0;
+  const mfColor = mf > 0.3 ? COL.up : mf < -0.3 ? COL.down : "#94a3b8";
+
   return (
     <div
       style={{
@@ -578,7 +600,7 @@ function SectorRotationPanel({ d }) {
           fontSize: 11,
           fontWeight: 700,
           letterSpacing: 0.8,
-          color: "#facc15",
+          color: COL.gold,
           marginBottom: 10,
         }}
       >
@@ -604,13 +626,7 @@ function SectorRotationPanel({ d }) {
           <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
             ROTATION
           </div>
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: rotation.color,
-            }}
-          >
+          <div style={{ fontSize: 14, fontWeight: 700, color: rotation.color }}>
             {rotation.text}
           </div>
           <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>
@@ -631,11 +647,7 @@ function SectorRotationPanel({ d }) {
             VS MARKET
           </div>
           <div
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: relStrength.color,
-            }}
+            style={{ fontSize: 14, fontWeight: 700, color: relStrength.color }}
           >
             {relStrength.text}
           </div>
@@ -647,56 +659,38 @@ function SectorRotationPanel({ d }) {
       </div>
 
       <div style={{ fontSize: 13, lineHeight: 1.7 }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>Breadth</span>
+        <SpaceRow label="Breadth">
           <span style={{ fontSize: 18, fontWeight: 600 }}>
             <b style={{ color: breadthLabel.color }}>{breadthLabel.text}</b>{" "}
             <span style={{ color: "#94a3b8" }}>(</span>
             <span style={{ color: "#ffffff" }}>{upCount}</span>
             <span style={{ color: "#94a3b8" }}>/{stockCount})</span>
-            <span style={{ color: "#1bbbd7" }}> UP</span>
+            <span style={{ color: COL.cyan }}> UP</span>
           </span>
-        </div>
+        </SpaceRow>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>Money flow</span>
-          <b
-            style={{
-              color:
-                (d.moneyFlowScore ?? 0) > 0.3
-                  ? "#22c55e"
-                  : (d.moneyFlowScore ?? 0) < -0.3
-                    ? "#ef4444"
-                    : "#94a3b8",
-            }}
-          >
-            {(d.moneyFlowScore ?? 0) >= 0 ? "+" : ""}
-            {(d.moneyFlowScore ?? 0).toFixed(2)}
+        <SpaceRow label="Money flow">
+          <b style={{ color: mfColor }}>
+            {mf >= 0 ? "+" : ""}
+            {mf.toFixed(2)}
           </b>
-        </div>
+        </SpaceRow>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>Sector price</span>
-          <b
-            style={{
-              color: (d.price ?? 0) > 0 ? "#22c55e" : "#ef4444",
-            }}
-          >
+        <SpaceRow label="Sector price">
+          <b style={{ color: (d.price ?? 0) > 0 ? COL.up : COL.down }}>
             {(d.price ?? 0) >= 0 ? "+" : ""}
             {(d.price ?? 0).toFixed(2)}%
           </b>
-        </div>
+        </SpaceRow>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>Market avg</span>
+        <SpaceRow label="Market avg">
           <span style={{ color: "#cbd5f5" }}>
             {(d.marketAvgPrice ?? 0) >= 0 ? "+" : ""}
             {(d.marketAvgPrice ?? 0).toFixed(2)}%
           </span>
-        </div>
+        </SpaceRow>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>Dispersion</span>
+        <SpaceRow label="Dispersion">
           <span style={{ color: "#cbd5f5" }}>
             {(d.dispersion ?? 0).toFixed(2)}
             {(d.dispersion ?? 0) > 2.5 && (
@@ -704,7 +698,7 @@ function SectorRotationPanel({ d }) {
                 style={{
                   marginLeft: 6,
                   fontSize: 11,
-                  color: "#facc15",
+                  color: COL.gold,
                   fontWeight: 600,
                 }}
               >
@@ -712,24 +706,18 @@ function SectorRotationPanel({ d }) {
               </span>
             )}
           </span>
-        </div>
+        </SpaceRow>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>Delivery</span>
-          <b style={{ color: "#facc15" }}>{(d.delivery ?? 0).toFixed(2)}%</b>
-        </div>
+        <SpaceRow label="Delivery">
+          <b style={{ color: COL.gold }}>{(d.delivery ?? 0).toFixed(2)}%</b>
+        </SpaceRow>
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: "#94a3b8" }}>OI change (avg)</span>
-          <b
-            style={{
-              color: (d.oiChangePct ?? 0) > 0 ? "#22c55e" : "#ef4444",
-            }}
-          >
+        <SpaceRow label="OI change (avg)">
+          <b style={{ color: (d.oiChangePct ?? 0) > 0 ? COL.up : COL.down }}>
             {(d.oiChangePct ?? 0) >= 0 ? "+" : ""}
             {(d.oiChangePct ?? 0).toFixed(2)}%
           </b>
-        </div>
+        </SpaceRow>
       </div>
     </div>
   );
@@ -774,9 +762,6 @@ const CustomTooltip = React.memo(function CustomTooltip({
   const isStock = d.stock !== undefined;
   const fill = resolveBubbleColor(d);
 
-  const id = d.stock ?? d.sector;
-  const key = id + "-" + d.x;
-
   const isSectorBubble =
     !isStock &&
     (d.moneyFlowScore !== undefined ||
@@ -785,184 +770,99 @@ const CustomTooltip = React.memo(function CustomTooltip({
 
   const hasSignal = !!d.bubbleSignal;
 
+  const nameLabel = mode === "all" || mode === "stock" ? d.stock : d.sector;
+  const futColor = upDown(d.futPriceChange);
+  const priceColor = upDown(d.price);
+  const num = (v) => v?.toLocaleString("en-IN");
+
   return (
     <div
       style={{
         position: "relative",
         zIndex: 9999,
         pointerEvents: "auto",
-
         background: "linear-gradient(180deg,#0b0b0c,#111)",
         border: "1px solid #333",
         borderRadius: 6,
         padding: "12px 14px",
         minWidth: 240,
         backdropFilter: "blur(6px)",
-        color: "#e5e7eb",
+        color: COL.text,
         fontFamily: "system-ui",
         boxShadow: `
-                          0 0 0 1px rgba(255,255,255,0.04),
-                          0 0 12px rgba(56,189,248,0.25),
-                          0 0 30px rgba(56,189,248,0.18),
-                          inset 0 0 10px rgba(0,0,0,0.6)
-                        `,
+          0 0 0 1px rgba(255,255,255,0.04),
+          0 0 12px rgba(56,189,248,0.25),
+          0 0 30px rgba(56,189,248,0.18),
+          inset 0 0 10px rgba(0,0,0,0.6)
+        `,
       }}
     >
+      {/* ── SECTOR header (when not a stock) ── */}
+      {!isStock && <div style={HEADER_STOCK}>{nameLabel}</div>}
+      {!isStock && <div style={{...HEADER_DATE, fontSize: 12}}>{fmtDate(d.x)}</div>}
       {!isStock && (
-        <div
-          style={{
-            fontSize: 24,
-            color: "#c084fc",
-            fontWeight: 600,
-            height: 50,
-          }}
-        >
-          {mode === "all" || mode === "stock" ? d.stock : d.sector}
-        </div>
-      )}
-      {!isStock && (
-        <div
-          style={{
-            fontSize: 24,
-            color: "#1bbbd7",
-            fontWeight: 600,
-            height: 50,
-          }}
-        >
-          {new Date(d.x).toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          })}
-        </div>
-      )}
-
-      {!isStock && (
-        <div style={{ fontSize: 16 }}>
-          Turnover:{" "}
-          <b style={{ color: "#60a5fa" }}>{formatTurnoverCr(d.turnover)}</b>
-        </div>
+        <Row
+          label="Turnover"
+          value={formatTurnoverCr(d.turnover)}
+          color={COL.blue}
+        />
       )}
 
       {isSectorBubble && <SectorRotationPanel d={d} />}
 
+      {/* ── STOCK two-column body ── */}
       <div style={{ display: "flex", gap: 20 }}>
+        {/* LEFT column */}
         <div style={{ flex: 1 }}>
+          {isStock && <div style={HEADER_STOCK}>{nameLabel}</div>}
           {isStock && (
-            <div
-              style={{
-                fontSize: 24,
-                color: "#c084fc",
-                fontWeight: 600,
-                height: 50,
-              }}
-            >
-              {mode === "all" || mode === "stock" ? d.stock : d.sector}
-            </div>
+            <Row
+              label="Fut Price"
+              value={d.futPrice?.toFixed(2)}
+              color={futColor}
+            />
           )}
           {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Fut Price:{" "}
-              <b
-                style={{
-                  color: d.futPriceChange > 0 ? "#22c55e" : "#ef4444",
-                }}
-              >
-                {d.futPrice?.toFixed(2)}
-              </b>
-            </div>
+            <Row
+              label="Fut Price %"
+              value={`${d.futPriceChange?.toFixed(2)}%`}
+              color={futColor}
+            />
           )}
           {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Fut Price %:{" "}
-              <b
-                style={{
-                  color: d.futPriceChange > 0 ? "#22c55e" : "#ef4444",
-                }}
-              >
-                {d.futPriceChange?.toFixed(2)}%
-              </b>
-            </div>
-          )}
-
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Turnover:{" "}
-              <b style={{ color: "#60a5fa" }}>{formatMoney(d.fnoTurnover)}</b>
-            </div>
+            <Row
+              label="Turnover"
+              value={formatMoney(d.fnoTurnover)}
+              color={COL.blue}
+            />
           )}
           {isStock && (
-            <div style={{ fontSize: 16 }}>
-              OI:{" "}
-              <b style={{ color: "#facc15" }}>
-                {d.openInterest?.toLocaleString("en-IN")}
-              </b>
-            </div>
+            <Row label="OI" value={num(d.openInterest)} color={COL.gold} />
           )}
           {isStock && (
-            <div style={{ fontSize: 16 }}>
-              OI %:{" "}
-              <b
-                style={{
-                  color: d.oiChangePct > 0 ? "#22c55e" : "#ef4444",
-                }}
-              >
-                {d.oiChangePct?.toFixed(2)}%
-              </b>
-            </div>
+            <Row
+              label="OI %"
+              value={`${d.oiChangePct?.toFixed(2)}%`}
+              color={upDown(d.oiChangePct)}
+            />
           )}
           {isStock && (
-            <div style={{ fontSize: 16, fontWeight: 500 }}>
-              Shares:{" "}
-              <span style={{ color: "#69696b" }}>
-                {d.shares?.toLocaleString("en-IN")}
-              </span>
-            </div>
+            <Row label="Shares" value={num(d.shares)} muted style={ROW_MUTED} />
           )}
-          
-          {/** 
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Lots:{" "}
-              <span style={{ color: "#69696b" }}>
-                {d.lots?.toLocaleString("en-IN")}
-              </span>
-            </div>
-          )}
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Volume:{" "}
-              <span style={{ color: "#69696b" }}>
-                {d.fnoVolume?.toLocaleString("en-IN")}
-              </span>
-            </div>
-          )}
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Total Trades:{" "}
-              <span style={{ color: "#69696b" }}>
-                {d.totalTrades?.toLocaleString("en-IN")}
-              </span>
-            </div>
-          )}
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Contracts:{" "}
-              <span style={{ color: "#69696b" }}>
-                {d.contracts?.toLocaleString("en-IN")}
-              </span>
-            </div>
-          )}
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Avg. Trade Size:{" "}
-              <span style={{ color: "#69696b" }}>
-                {d.avgTradeSize?.toLocaleString("en-IN")}
-              </span>
-            </div>
-          )}
-            */}
+          {/**
+            {isStock && <Row label="Lots" value={num(d.lots)} muted />}
+            {isStock && <Row label="Volume" value={num(d.fnoVolume)} muted />}
+            {isStock && (
+              <Row label="Total Trades" value={num(d.totalTrades)} muted />
+            )}
+            {isStock && <Row label="Contracts" value={num(d.contracts)} muted />}
+            {isStock && (
+              <Row label="Avg. Trade Size" value={num(d.avgTradeSize)} muted />
+            )}
+          */}  
         </div>
+
+        {/* DIVIDER */}
         {isStock && (
           <div
             style={{
@@ -975,87 +875,49 @@ const CustomTooltip = React.memo(function CustomTooltip({
           />
         )}
 
+        {/* RIGHT column */}
         <div style={{ flex: 1 }}>
+          {isStock && <div style={{...HEADER_DATE, fontSize: 12}}>{fmtDate(d.x)}</div>}
           {isStock && (
-            <div
-              style={{
-                fontSize: 24,
-                color: "#1bbbd7",
-                fontWeight: 600,
-                height: 50,
-              }}
-            >
-              {new Date(d.x).toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </div>
+            <Row label="Price" value={d.close ?? "_"} color={priceColor} />
           )}
           {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Price:{" "}
-              <b
-                style={{
-                  color: d.price > 0 ? "#22c55e" : "#ef4444",
-                }}
-              >
-                {d.close ?? "_"}
-              </b>
-            </div>
+            <Row
+              label="Price %"
+              value={`${d.price?.toFixed(2)}%`}
+              color={priceColor}
+            />
           )}
           {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Price % :{" "}
-              <b
-                style={{
-                  color: d.price > 0 ? "#22c55e" : "#ef4444",
-                }}
-              >
-                {d.price?.toFixed(2)}%
-              </b>
-            </div>
-          )}
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Turnover:{" "}
-              <b style={{ color: "#60a5fa" }}>{formatTurnoverCr(d.turnover)}</b>
-            </div>
-          )}
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Change:{" "}
-              <b style={{ color: fill }}>{d.turnoverChange?.toFixed(2)}%</b>
-            </div>
-          )}
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Delivery:{" "}
-              <b style={{ color: "#facc15" }}>{d.delivery?.toFixed(2)}%</b>
-            </div>
-          )}
-
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Expiry:{" "}
-              <span style={{ color: "#69696b" }}>{d.expiry || "-"}</span>
-            </div>
-          )}
-
-          {isStock && (
-            <div style={{ fontSize: 16 }}>
-              Lot Size:{" "}
-              <span style={{ color: "#69696b" }}>
-                {d.lotSize?.toLocaleString("en-IN")}
-              </span>
-            </div>
+            <Row
+              label="Turnover"
+              value={formatTurnoverCr(d.turnover)}
+              color={COL.blue}
+            />
           )}
           {/**
+            {isStock && (
+              <Row
+                label="Change"
+                value={`${d.turnoverChange?.toFixed(2)}%`}
+                color={fill}
+              />
+            )}
+          */}
           {isStock && (
-            <div style={{ fontSize: 16 }}>
-              OI Signal: <b style={{ color: "#a78bfa" }}>{d.oiAnalysis}</b>
-            </div>
-          )} */}
+            <Row
+              label="Delivery"
+              value={`${d.delivery?.toFixed(2)}%`}
+              color={COL.gold}
+            />
+          )}
+         {isStock && <Row label="Expiry" value={d.expiry || "-"} muted />}
+          {/** 
+            {isStock && <Row label="Lot Size" value={num(d.lotSize)} muted />}
+            {isStock && (
+              <Row label="OI Signal" value={d.oiAnalysis} color={COL.violet} />
+            )}
+          */}
         </div>
       </div>
 
@@ -1070,7 +932,7 @@ const CustomTooltip = React.memo(function CustomTooltip({
             currentDate={d.x}
             latestDate={latestDate}
           />
-          <PremiumFeature feature="OI_PRICE_CHART">
+           <PremiumFeature feature="OI_PRICE_CHART">
             <div style={{ marginTop: 12 }}>
               <MemoOIPriceChart
                 key={d.stock + "-" + d.x}
@@ -1081,7 +943,7 @@ const CustomTooltip = React.memo(function CustomTooltip({
                 days={30}
               />
             </div>
-          </PremiumFeature>
+           </PremiumFeature> 
         </>
       )}
     </div>

@@ -46,7 +46,7 @@ const MemoHeader = React.memo(Header);
 const MemoFooter = React.memo(Footer);
 
 const EMPTY_ARRAY = Object.freeze([]);
-const DEFAULT_SECTOR = "PHARMA";
+const DEFAULT_SECTOR = "METAL";
 
 // ═══════════════════════════════════════════════════════════════════════
 // Outer wrapper with Suspense boundary

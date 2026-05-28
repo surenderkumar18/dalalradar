@@ -2,7 +2,15 @@
 
 // components/PremiumFeature.jsx
 //
-// 🎯 PREMIUM FEATURE WRAPPER — Conditionally render UI based on flags.
+// 🎯 PREMIUM FEATURE WRAPPER — Conditionally render UI based on flags + role.
+//
+// ROLES (see utils/featureAccess.js):
+//   admin    → sees all BUILT features (free + premium)
+//   premium  → sees free + premium
+//   general  → sees free only
+//
+// A globally-killed feature (FEATURE_FLAGS.X = false) is hidden for
+// EVERYONE — including admins — so unbuilt stubs never render/crash.
 //
 // USAGE (3 patterns):
 //
@@ -11,31 +19,22 @@
 //      <MemoSearch ... />
 //    </PremiumFeature>
 //
-//    → Free user: hidden if STOCK_SEARCH is premium-only
-//    → Premium user: visible
-//    → Killed globally (FEATURE_FLAGS.STOCK_SEARCH = false): hidden for all
-//
 // 2. WITH FALLBACK (upgrade prompt):
-//    <PremiumFeature
-//      feature="EXPORT_CSV"
-//      fallback={<UpgradePrompt feature="Export" />}
-//    >
+//    <PremiumFeature feature="EXPORT_CSV" fallback={<UpgradePrompt />}>
 //      <ExportCSVButton />
 //    </PremiumFeature>
-//
-//    → Free user: sees the upgrade prompt
-//    → Premium user: sees the actual button
 //
 // 3. WITH LOCKED OVERLAY (shows feature but disabled):
 //    <PremiumFeature feature="WHALE_DETECTION" showLocked>
 //      <WhalePanel />
 //    </PremiumFeature>
 //
-//    → Free user: sees WhalePanel with "🔒 Premium" overlay (disabled)
-//    → Premium user: sees WhalePanel fully working
-//
 
-import { hasFeature, isPremiumOnly, isFeatureLive } from "@/utils/featureAccess";
+import {
+  hasFeature,
+  isPremiumOnly,
+  isFeatureLive,
+} from "@/utils/featureAccess";
 import { useUserPlan } from "@/context/UserPlanContext";
 
 export default function PremiumFeature({
@@ -44,15 +43,15 @@ export default function PremiumFeature({
   fallback = null,
   showLocked = false,
 }) {
-  const { isPremiumUser } = useUserPlan();
+  const { role } = useUserPlan();
 
-  // ─── Globally killed feature → never show ───
+  // ─── Globally killed feature → never show (admins included) ───
   if (!isFeatureLive(feature)) {
     return null;
   }
 
-  // ─── User has access → show normally ───
-  if (hasFeature(feature, isPremiumUser)) {
+  // ─── User has access (general/premium/admin per role) → show normally ───
+  if (hasFeature(feature, role)) {
     return <>{children}</>;
   }
 

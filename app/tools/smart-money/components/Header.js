@@ -10,6 +10,7 @@ import BubbleSizeControl from "./BubbleSizeControl";
 import StockSearch from "@/app/components/Search";
 import CustomDropdown from "@/components/customDropDown";
 import PremiumFeature from "@/components/PremiumFeature";
+import { useUserPlan } from "@/context/UserPlanContext";
 
 const MemoSearch = React.memo(StockSearch);
 
@@ -47,6 +48,9 @@ export default function Header({
   const [showViewPanel, setShowViewPanel] = useState(false);
   const panelRef = useRef();
   const [screenWidth, setScreenWidth] = useState(1600);
+
+  // 🔑 Admin sees every control regardless of screen size.
+  const { isAdmin } = useUserPlan();
 
   useEffect(() => {
     const update = () => {
@@ -143,7 +147,7 @@ export default function Header({
       <DashboardHeader>
         {/* 🔹 RIGHT: CONTROLS */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {canShowOnDevice("STOCK_SEARCH", screenWidth) && (
+          {canShowOnDevice("STOCK_SEARCH", screenWidth, isAdmin) && (
             <div
               style={{
                 display: "flex",
@@ -171,7 +175,7 @@ export default function Header({
               </div>
             </div>
           )}
-          {canShowOnDevice("APPLY_CONTROLS", screenWidth) && (
+          {canShowOnDevice("APPLY_CONTROLS", screenWidth, isAdmin) && (
             <PremiumFeature feature="APPLY_CONTROLS" showLocked>
               <label
                 className="custom-checkbox"
@@ -263,7 +267,7 @@ export default function Header({
             ]}
           />
         </span>
-        {canShowOnDevice("BUBBLE_POSITION", screenWidth) && (
+        {canShowOnDevice("BUBBLE_POSITION", screenWidth, isAdmin) && (
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <CustomDropdown
               label="Bubble Position"
@@ -332,7 +336,7 @@ export default function Header({
                 >
                   {/* 🔥 NEW: Signal Engine toggle — placed FIRST for prominence */}
                   <CheckboxItem
-                    label="🎯 Signal Engine (BUY/SELL)"
+                    label="🎯 Signal Engine"
                     checked={enableSignalEngine}
                     onChange={setEnableSignalEngine}
                   />

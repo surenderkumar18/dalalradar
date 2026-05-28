@@ -1,67 +1,44 @@
 "use client";
 
-// context/UserPlanContext.js
+// context/UserPlanContext.jsx
 //
-// 🎯 USER PLAN CONTEXT — Holds the current user's plan globally.
+// 🎯 USER PLAN / ROLE CONTEXT
 //
-// SOLVES: Prop-drilling `isPremiumUser` through 10 components.
+// Three roles (see utils/featureAccess.js → ROLES):
+//   admin · premium · general
 //
-// HOW IT WORKS:
-//   1. Wrap your app once in <UserPlanProvider>
-//   2. Any component can read user plan via useUserPlan()
-//   3. No need to pass isPremiumUser as prop
+// Provides:
+//   role           → "admin" | "premium" | "general"
+//   isAdmin        → role === "admin"
+//   isPremiumUser  → admin OR premium  (legacy code that checks
+//                    isPremiumUser keeps working — admins pass it)
 //
-// CURRENT STATE:
-//   isPremiumUser is hardcoded to false (no auth yet).
+// SETTING THE ROLE:
+//   Wrap your layout with <UserPlanProvider role={...}>.
+//   Hardcode for now; later derive `role` from your auth session.
 //
-// WHEN AUTH IS ADDED:
-//   Replace the hardcoded value with a real auth check
-//   (Supabase, Clerk, etc.). Components don't change.
+//   import { UserPlanProvider } from "@/context/UserPlanContext";
+//   import { ROLES } from "@/utils/featureAccess";
+//   <UserPlanProvider role={ROLES.ADMIN}>{children}</UserPlanProvider>
 //
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext } from "react";
+import { ROLES } from "@/utils/featureAccess";
 
-// ─── CONTEXT ───────────────────────────────────────────────────
 const UserPlanContext = createContext({
+  role: ROLES.GENERAL,
+  isAdmin: false,
   isPremiumUser: false,
-  plan: "free", // "free" | "premium" | "admin"
-  setPlan: () => {},
 });
 
-// ─── PROVIDER ──────────────────────────────────────────────────
-export function UserPlanProvider({ children }) {
-  const [plan, setPlan] = useState("free");
-
-  // ─── ADMIN OVERRIDE (for testing) ───
-  // To preview premium features without real auth:
-  //   In browser console:
-  //   localStorage.setItem("dalalradar_plan", "premium")
-  //   → refresh page → all premium features visible
-  //
-  //   To reset: localStorage.removeItem("dalalradar_plan")
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = localStorage.getItem("dalalradar_plan");
-    if (stored === "premium" || stored === "admin") {
-      setPlan(stored);
-    }
-  }, []);
-
-  // ─── TODO: When auth is added, replace the useEffect above with: ───
-  //
-  //   useEffect(() => {
-  //     async function loadUserPlan() {
-  //       const res = await fetch("/api/user/me");
-  //       const user = await res.json();
-  //       setPlan(user.tier || "free");
-  //     }
-  //     loadUserPlan();
-  //   }, []);
+export function UserPlanProvider({ role = ROLES.GENERAL, children }) {
+  const isAdmin = role === ROLES.ADMIN;
 
   const value = {
-    isPremiumUser: plan === "premium" || plan === "admin",
-    plan,
-    setPlan,
+    role,
+    isAdmin,
+    // 🔑 Admin counts as premium for any legacy isPremiumUser checks.
+    isPremiumUser: isAdmin || role === ROLES.PREMIUM,
   };
 
   return (
@@ -71,7 +48,6 @@ export function UserPlanProvider({ children }) {
   );
 }
 
-// ─── HOOK ──────────────────────────────────────────────────────
 export function useUserPlan() {
   return useContext(UserPlanContext);
 }

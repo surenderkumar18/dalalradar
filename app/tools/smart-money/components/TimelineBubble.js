@@ -13,6 +13,7 @@ import { resolveSignalStyle } from "../utils/signalStyles.js";
 
 import { resolveBubbleColor } from "@/app/tools/smart-money/utils/bubbleEngineSub.js";
 import CustomTooltip from "./CustomTooltip.js";
+import PinnedTooltip from "./PinnedTooltip.js";
 
 import {
   ScatterChart,
@@ -143,7 +144,7 @@ const DateTick = React.memo(
                 : viewportScale < 1
                   ? isActive
                     ? 13
-                    : 11
+                    :8
                   : isActive
                     ? 14
                     : 12
@@ -441,6 +442,18 @@ function TimelineBubble({
   const activeDateRef = useRef(activeDate);
   const expiryColorMapRef = useRef({});
   const hoveredKeyRef = useRef(null);
+  // 🔥 CLICK-TO-PIN: pinned bubble (works on touch + desktop click)
+  const [pinned, setPinned] = useState(null); // { payload, anchor:{x,y} }
+
+  // Detect touch capability — on touch devices we suppress the
+  // hover tooltip entirely (it can't be dismissed without a mouse).
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    const touch =
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+    setIsTouch(touch);
+  }, []);
 
   const [viewportScale, setViewportScale] = useState(1);
 
@@ -925,6 +938,25 @@ function TimelineBubble({
           handleBubbleLeave(e);
           if (props.onMouseLeave) props.onMouseLeave(e);
         };
+        // 🔥 CLICK-TO-PIN: tap/click pins the tooltip (works on touch)
+        // 🔥 CLICK-TO-PIN: tap/click pins the tooltip (works on touch)
+        const onHitClick = (e) => {
+          e.stopPropagation();
+          // anchor at the visible bubble's screen position
+          const rectEl = e.currentTarget.getBoundingClientRect();
+          // chart area bounds — tooltip will be clamped to stay inside this
+          const cb = chartRef.current?.getBoundingClientRect();
+          setPinned({
+            payload,
+            anchor: {
+              x: rectEl.left + rectEl.width / 2,
+              y: rectEl.top + rectEl.height / 2,
+            },
+            bounds: cb
+              ? { left: cb.left, top: cb.top, right: cb.right, bottom: cb.bottom }
+              : null,
+          });
+        };
 
         return (
           <g>
@@ -1039,6 +1071,7 @@ function TimelineBubble({
               onMouseEnter={onHitEnter}
               onMouseMove={onHitMove}
               onMouseLeave={onHitLeave}
+              onClick={onHitClick}
             />
           </g>
         );
@@ -1200,6 +1233,25 @@ function TimelineBubble({
           handleBubbleLeave(e);
           if (props.onMouseLeave) props.onMouseLeave(e);
         };
+        // 🔥 CLICK-TO-PIN: tap/click pins the tooltip (works on touch)
+        // 🔥 CLICK-TO-PIN: tap/click pins the tooltip (works on touch)
+        const onHitClick = (e) => {
+          e.stopPropagation();
+          // anchor at the visible bubble's screen position
+          const rectEl = e.currentTarget.getBoundingClientRect();
+          // chart area bounds — tooltip will be clamped to stay inside this
+          const cb = chartRef.current?.getBoundingClientRect();
+          setPinned({
+            payload,
+            anchor: {
+              x: rectEl.left + rectEl.width / 2,
+              y: rectEl.top + rectEl.height / 2,
+            },
+            bounds: cb
+              ? { left: cb.left, top: cb.top, right: cb.right, bottom: cb.bottom }
+              : null,
+          });
+        };
 
         return (
           <g>
@@ -1246,6 +1298,7 @@ function TimelineBubble({
               onMouseEnter={onHitEnter}
               onMouseMove={onHitMove}
               onMouseLeave={onHitLeave}
+              onClick={onHitClick}
             />
           </g>
         );
@@ -1711,7 +1764,7 @@ function TimelineBubble({
                       return (
                         <g
                           className="axis-label-group"
-                          data-tour={isFirstSector ? "sector" : undefined} 
+                          data-tour={isFirstSector ? "sector" : undefined}
                           onClick={() => {
                             if (mode === "sector") {
                               setActiveCategory((prev) =>
@@ -1813,9 +1866,9 @@ function TimelineBubble({
                 ))}
             <Tooltip
               isAnimationActive={false}
-              cursor={showTooltip ? CURSOR_STYLE : false}
+              cursor={showTooltip && !isTouch && !pinned ? CURSOR_STYLE : false}
               wrapperStyle={tooltipWrapperStyle}
-              content={tooltipContent}
+              content={isTouch || pinned ? () => null : tooltipContent}
             />
             <Scatter
               isAnimationActive={mode === "all" ? false : true}
@@ -2021,6 +2074,19 @@ function TimelineBubble({
           >
             DALALRADAR - SMART MONEY RADAR
           </div>
+        )}
+        {/* 🔥 CLICK-TO-PIN tooltip — selectable, dismissable */}
+        {pinned && showTooltip && (
+          <PinnedTooltip
+            payload={pinned.payload}
+            anchor={pinned.anchor}
+            bounds={pinned.bounds}
+            latestDate={latestDate}
+            mode={mode}
+            bubbleRefs={bubbleRefs}
+            hoveredKeyRef={hoveredKeyRef}
+            onClose={() => setPinned(null)}
+          />
         )}
       </div>
     </div>
