@@ -4,6 +4,31 @@
 // - Bubbles render immediately (no signals first)
 // - Signals fetched async from protected backend
 // - Painted onto bubbles when API response arrives
+//
+// 🔧 SEARCH FIX (prior revision):
+//   The search across sectors used to "cancel" the navigation because
+//   setSelectedSector did router.replace inside the same tick as setMode
+//   + setHighlightStock. Fixed by making setSelectedSector a plain state
+//   setter and syncing the URL from a separate useEffect — one direction
+//   only (state → URL), so concurrent state updates never race the router.
+//
+// ⚡ SIGNAL ENGINE PERF FIX (this revision):
+//   Toggling "Signal Engine" used to take 3-4 seconds because flipping
+//   enableSignalEngine forced:
+//     (1) chartData useMemo to re-derive (new array ref),
+//     (2) TimelineBubble's React.memo to fail and re-render,
+//     (3) Recharts to re-mount every bubble shape (12,000+ <circle>
+//         nodes at 200+ stocks × 60 days).
+//   Fixed via CSS-only dual-render: signal bubbles render BOTH the signal
+//   layer AND the normal-color fallback inside the same shape. The wrapper
+//   div carries dr-engine-on / dr-engine-off, and an inline <style> tag
+//   hides one layer or the other. Toggle is now a single className flip —
+//   zero React work, instant repaint.
+//   Additionally:
+//     - chartData no longer depends on enableSignalEngine.
+//     - The fetch effect caches signals across toggles (no more clearing
+//       signalsMap on toggle-off) and uses a ref to avoid refetching when
+//       the data hasn't changed.
 
 "use client";
 
@@ -82,29 +107,29 @@ function BubbleChartContent() {
   const [mode, setMode] = useState(initialSector ? "stock" : "sector");
   const [selectedSector, _setSelectedSector] = useState(initialSector);
 
-  // Replace the existing wrapped setSelectedSector with the plain setter…
-// (Keep `_setSelectedSector` as the React state setter, but call the public
-// setter `setSelectedSector` everywhere — it just updates state synchronously.)
+  // 🔧 Plain state setter — no router.replace inside.
+  // The URL is synced by the effect below so concurrent state updates
+  // (e.g. handleSearch sets sector + mode + highlightStock in one tick)
+  // never race router.replace and get canceled.
+  const setSelectedSector = _setSelectedSector;
 
-const setSelectedSector = _setSelectedSector;   // 🔧 plain setter, no router
-
-// 🔧 Sync URL when selectedSector changes — runs AFTER React commits state,
-// so it doesn't race with other state updates.
-useEffect(() => {
-  if (typeof window === "undefined") return;
-  const params = new URLSearchParams(window.location.search);
-  if (selectedSector) {
-    params.set("sector", selectedSector);
-  } else {
-    params.delete("sector");
-  }
-  const queryString = params.toString();
-  const target = queryString ? `${pathname}?${queryString}` : pathname;
-  // Avoid pushing the same URL repeatedly (e.g. initial mount).
-  if (window.location.pathname + window.location.search !== target) {
-    router.replace(target, { scroll: false });
-  }
-}, [selectedSector, pathname, router]);
+  // 🔧 Sync URL when selectedSector changes — runs AFTER React commits state,
+  // so it doesn't race with other state updates.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (selectedSector) {
+      params.set("sector", selectedSector);
+    } else {
+      params.delete("sector");
+    }
+    const queryString = params.toString();
+    const target = queryString ? `${pathname}?${queryString}` : pathname;
+    // Avoid pushing the same URL repeatedly (initial mount, idempotent calls).
+    if (window.location.pathname + window.location.search !== target) {
+      router.replace(target, { scroll: false });
+    }
+  }, [selectedSector, pathname, router]);
 
   const [timeline, setTimeline] = useState([]);
 
@@ -155,6 +180,11 @@ useEffect(() => {
 
   // 🔒 NEW: signals fetched from protected backend
   const [signalsMap, setSignalsMap] = useState({});
+
+  // ⚡ PERF: tracks the baseChartData identity we last fetched signals for.
+  // Lets us skip refetching when the user merely toggles the engine on/off
+  // without any data change — toggling becomes a pure CSS operation.
+  const lastFetchedDataRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem("enable_signal_engine", String(enableSignalEngine));
@@ -432,12 +462,31 @@ useEffect(() => {
     stockBubbleData,
   ]);
 
-  // 🔒 NEW: chartData = baseChartData + signals from API
+  // 🔒 chartData = baseChartData + signals from API
+  //
+  // ⚡ PERF: enableSignalEngine is INTENTIONALLY NOT a dependency here.
+  // Whether the engine is on or off, the chart data is the same — we always
+  // merge signals when present, and the visual toggle happens via CSS in
+  // the bubble shape's dual-render layer. This keeps chartData's identity
+  // stable across toggles, so TimelineBubble's React.memo passes and
+  // Recharts doesn't re-render every bubble.
   const chartData = useMemo(() => {
     if (!baseChartData?.length) return baseChartData;
-    if (!enableSignalEngine || Object.keys(signalsMap).length === 0) {
-      return baseChartData;
+    if (Object.keys(signalsMap).length === 0) return baseChartData;
+
+    // Pre-pass: if no key in signalsMap matches any bubble in baseChartData
+    // (e.g. stale signals after a sector switch with engine off), short-
+    // circuit and return baseChartData unchanged so the ref stays stable.
+    let hasMatch = false;
+    for (const b of baseChartData) {
+      const key = b.stock || b.sector;
+      if (signalsMap[`${key}-${b.x}`]) {
+        hasMatch = true;
+        break;
+      }
     }
+    if (!hasMatch) return baseChartData;
+
     return baseChartData.map((b) => {
       const key = b.stock || b.sector;
       const lookupKey = `${key}-${b.x}`;
@@ -452,19 +501,24 @@ useEffect(() => {
         hasWarnSignal: sig.bubbleSignal?.type === "WARN",
       };
     });
-  }, [baseChartData, signalsMap, enableSignalEngine]);
+  }, [baseChartData, signalsMap]);
 
-  // 🔒 NEW: Fetch signals from protected backend API
+  // 🔒 Fetch signals from protected backend API
+  //
+  // ⚡ PERF: This effect is deliberately tolerant of engine toggles —
+  //   • Toggling OFF: return early. signalsMap is NOT cleared, so when the
+  //     user toggles back ON the cached signals are still present and the
+  //     CSS overlay can show them without a round-trip.
+  //   • Toggling ON: if baseChartData identity matches what we last fetched
+  //     for, return early. No refetch, no setState, no re-render.
+  //   • Real data change (sector switch, pastDays change, etc.) updates
+  //     baseChartData's identity, the guard fails, and a fresh fetch fires.
   useEffect(() => {
-    if (!enableSignalEngine) {
-      setSignalsMap({});
-      return;
-    }
+    if (!enableSignalEngine) return;
+    if (!baseChartData?.length) return;
+    if (lastFetchedDataRef.current === baseChartData) return;
 
-    if (!baseChartData?.length) {
-      setSignalsMap({});
-      return;
-    }
+    lastFetchedDataRef.current = baseChartData;
 
     // Group bubbles by key (stock or sector)
     const bubblesByKey = {};
@@ -612,7 +666,9 @@ useEffect(() => {
     init();
   }, []);
 
-  // Validate URL sector once sectors data is loaded
+  // Validate URL sector once sectors data is loaded.
+  // 🔧 No longer touches the URL directly — clearing selectedSector lets
+  // the sync effect above remove ?sector= cleanly.
   useEffect(() => {
     if (!sectors || sectors.length === 0) return;
     if (!selectedSector) return;
@@ -625,15 +681,8 @@ useEffect(() => {
       );
       _setSelectedSector(null);
       setMode("sector");
-
-      const params = new URLSearchParams(window.location.search);
-      params.delete("sector");
-      const queryString = params.toString();
-      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
-        scroll: false,
-      });
     }
-  }, [sectors, selectedSector, pathname, router]);
+  }, [sectors, selectedSector]);
 
   // Browser tab title shows current sector
   useEffect(() => {
@@ -654,13 +703,25 @@ useEffect(() => {
     }
   }, [isTyping, memoChartData, memoCategories, memoTicks]);
 
-  const handleSearch = (stock, sectorFromSearch) => {
-    const sector = sectorFromSearch || stockToSectorMap[stock];
-    if (!sector) return;
-    setSelectedSector(sector);
-    setMode("stock");
-    setHighlightStock(stock);
-  };
+  // 🔧 SEARCH FLOW — order matters:
+  //   1) clear stale activeCategory (so the previous sector's active stock
+  //      doesn't briefly dim the new sector's bubbles)
+  //   2) switch mode + sector + highlight in the same tick — these are
+  //      all plain setState calls now, no router race
+  //   3) clear the search input
+  const handleSearch = useCallback(
+    (stock, sectorFromSearch) => {
+      const sector = sectorFromSearch || stockToSectorMap[stock];
+      if (!sector) return;
+
+      setActiveCategory(null);
+      setMode("stock");
+      setSelectedSector(sector);
+      setHighlightStock(stock);
+      setSearchQuery("");
+    },
+    [stockToSectorMap, setSelectedSector],
+  );
 
   useEffect(() => {
     if (!sectors.length) return;
@@ -711,8 +772,26 @@ useEffect(() => {
         overflowX: isMobile ? "auto" : "visible",
         WebkitOverflowScrolling: "touch",
         width: "100%",
+        // 🔧 PINCH-ZOOM FIX: tell the browser explicitly that this region
+        // accepts one-finger HORIZONTAL panning AND two-finger PINCH-ZOOM.
+        // Without this, mobile browsers (especially iOS Safari) sometimes
+        // consume two-finger touches as "harder scroll the container"
+        // rather than letting them bubble up as a page-level pinch-zoom.
+        // `pan-x pinch-zoom` keeps existing horizontal-scroll behavior
+        // intact while making zoom-gesture intent explicit.
+        touchAction: isMobile ? "pan-x pinch-zoom" : undefined,
       }}
     >
+      {/* ⚡ SIGNAL ENGINE PERF FIX: CSS-only toggle.
+          Each signal bubble renders two layers — .dr-signal-overlay (the
+          BUY/SELL/WARN visual) and .dr-signal-fallback (the normal-color
+          bubble). The wrapper below carries dr-engine-on / dr-engine-off,
+          and these rules hide one layer or the other. Flipping the engine
+          is a pure className change — no React/Recharts re-render. */}
+      <style>{`
+        .dr-engine-off .dr-signal-overlay { display: none; }
+        .dr-engine-on  .dr-signal-fallback { display: none; }
+      `}</style>
       {isMobile && (
         <div
           style={{
@@ -752,6 +831,9 @@ useEffect(() => {
                   }}
                 >
                   <div
+                    className={
+                      enableSignalEngine ? "dr-engine-on" : "dr-engine-off"
+                    }
                     style={{
                       display: "flex",
                       flexDirection: "column",

@@ -1,12 +1,43 @@
 // app/tools/smart-money/components/Footer.js
+//
+// 🔧 FOOTER FIXES (this revision):
+//
+//   1. Mouse-hover effect on sector tabs — FIXED via state-based hover.
+//      The visible sector tabs and the MORE-dropdown items had inline
+//      `style` props for background/color but no hover state, so even if
+//      a `.sector-tab:hover` CSS rule existed, the inline style would
+//      win (higher specificity). Now `hoveredSector` (visible row) and
+//      `hoveredOverflow` (MORE list) drive the same `style` prop, so
+//      hover is consistent and survives any parent re-render.
+//
+//   2. Clicking a sector in MORE now PROMOTES it into the visible row.
+//      Previously the click only set selectedSector — but visibleSectors
+//      vs. overflowSectors is computed from the `sectors` array order,
+//      and the clicked sector stayed beyond the visible cutoff. So you'd
+//      see the dropdown close, the chart switch, but the visible row
+//      wouldn't show your selection. Now we splice the clicked sector
+//      into the last-visible position via moveSector, pushing the
+//      previously-last visible into the overflow. User's manual sector
+//      order is otherwise preserved.
+//
+//   3. useEffect → useLayoutEffect for overflow calc, so the visible/
+//      overflow recomputation runs before paint after a promotion (no
+//      one-frame flicker showing the stale visible row).
 
 "use client";
 
 import React, {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
+
+// Isomorphic layout effect — useLayoutEffect on the client, useEffect on
+// the server (Next.js SSR would otherwise warn). Footer is "use client"
+// so this mostly matters for the first render hydration step.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const indicatorStyle = {
   width: 3,
@@ -43,15 +74,33 @@ const Footer = React.memo(function Footer({
   const [overflowSectors, setOverflowSectors] =
     useState([]);
 
+  // 🔧 HOVER STATE — one source of truth per row (visible vs overflow).
+  // Both feed the same `style` prop on the tabs, so a parent re-render
+  // can't clobber the highlight the way an imperative
+  //   e.currentTarget.style.background = "..."
+  // approach would.
+  const [hoveredSector, setHoveredSector] =
+    useState(null);
+
+  const [hoveredOverflow, setHoveredOverflow] =
+    useState(null);
+
   const containerRef = useRef(null);
 
   const sectorMeasureRef = useRef({});
 
   // =========================================
   // 📏 DYNAMIC OVERFLOW CALCULATION
+  //
+  // useLayoutEffect (not useEffect) so the recomputation runs after the
+  // DOM commits but BEFORE the browser paints. When we promote a sector
+  // from MORE into the visible row (via moveSector), `sectors` changes,
+  // this effect re-runs, and visibleSectors/overflowSectors update in
+  // the same pre-paint pass — no one-frame flicker where the old visible
+  // row paints first.
   // =========================================
 
-  useEffect(() => {
+  useIsoLayoutEffect(() => {
     function calculateOverflow() {
       if (!containerRef.current) return;
 
@@ -103,6 +152,24 @@ const Footer = React.memo(function Footer({
         calculateOverflow
       );
   }, [sectors]);
+
+  // 🔧 PROMOTE: when user clicks a sector inside MORE, slot it into the
+  // last visible position so the visible row reflects their selection.
+  // The previously-last visible sector gets pushed into MORE. Everything
+  // else keeps its relative order.
+  const promoteOverflowSector = (sec) => {
+    const from = sectors.indexOf(sec);
+    if (from < 0) return;
+
+    const to = Math.max(
+      0,
+      visibleSectors.length - 1
+    );
+
+    if (from > to) {
+      moveSector(from, to);
+    }
+  };
 
   return (
     <div
@@ -265,6 +332,12 @@ const Footer = React.memo(function Footer({
             sec === selectedSector &&
             mode !== "favorites";
 
+          // 🔧 Single source of truth for hover. Drives the same
+          // `style` prop as `isActive`, so React renders can't
+          // clobber the highlight.
+          const isHovered =
+            hoveredSector === sec && !isActive;
+
           return (
             <React.Fragment key={sec}>
               {dropIndex === index && (
@@ -285,6 +358,14 @@ const Footer = React.memo(function Footer({
 
                   onSectorClick?.(sec);
                 }}
+                onMouseEnter={() =>
+                  setHoveredSector(sec)
+                }
+                onMouseLeave={() =>
+                  setHoveredSector((prev) =>
+                    prev === sec ? null : prev
+                  )
+                }
                 style={{
                   flexShrink: 0,
 
@@ -294,18 +375,22 @@ const Footer = React.memo(function Footer({
 
                   background: isActive
                     ? "var(--green)"
-                    : "transparent",
+                    : isHovered
+                      ? "rgba(255,255,255,0.08)"
+                      : "transparent",
 
                   color: isActive
                     ? "#0a0a0c"
-                    : "#94a3b8",
+                    : isHovered
+                      ? "#ffffff"
+                      : "#94a3b8",
 
                   fontWeight: isActive
                     ? 700
                     : 500,
 
                   transition:
-                    "all 0.2s ease",
+                    "all 0.15s ease",
 
                   cursor: draggingSector
                     ? "grabbing"
@@ -431,6 +516,12 @@ const Footer = React.memo(function Footer({
                   const isActive =
                     sec === selectedSector;
 
+                  // 🔧 Hover for overflow items — same pattern as
+                  // visible tabs.
+                  const isHovered =
+                    hoveredOverflow === sec &&
+                    !isActive;
+
                   return (
                     <div
                       key={sec}
@@ -439,8 +530,29 @@ const Footer = React.memo(function Footer({
 
                         setActiveCategory(null);
 
+                        // 🔧 Move clicked sector into the visible
+                        // row BEFORE we notify the parent of the
+                        // selection. Order: reorder first so the
+                        // useLayoutEffect picks up the new sectors
+                        // array on the same render as the
+                        // selectedSector update from onSectorClick.
+                        promoteOverflowSector(
+                          sec
+                        );
+
                         onSectorClick?.(sec);
                       }}
+                      onMouseEnter={() =>
+                        setHoveredOverflow(sec)
+                      }
+                      onMouseLeave={() =>
+                        setHoveredOverflow(
+                          (prev) =>
+                            prev === sec
+                              ? null
+                              : prev
+                        )
+                      }
                       style={{
                         padding: "10px 14px",
 
@@ -448,11 +560,15 @@ const Footer = React.memo(function Footer({
 
                         background: isActive
                           ? "var(--green)"
-                          : "transparent",
+                          : isHovered
+                            ? "rgba(255,255,255,0.08)"
+                            : "transparent",
 
                         color: isActive
                           ? "#0a0a0c"
-                          : "#e2e8f0",
+                          : isHovered
+                            ? "#ffffff"
+                            : "#e2e8f0",
 
                         fontWeight: isActive
                           ? 700
@@ -460,6 +576,9 @@ const Footer = React.memo(function Footer({
 
                         borderBottom:
                           "1px solid rgba(255,255,255,0.05)",
+
+                        transition:
+                          "background 0.12s ease, color 0.12s ease",
                       }}
                     >
                       {sec}

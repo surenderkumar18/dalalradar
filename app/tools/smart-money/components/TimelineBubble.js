@@ -912,7 +912,13 @@ function TimelineBubble({
         // Use the signal style's opacity, modulated by time
         const finalOpacity = sigStyle.opacity * timeOpacity;
 
-        const bubbleKey = (payload.stock ?? payload.sector) + "-" + payload.x;
+        // ⚡ PERF FIX (Signal Engine toggle): suffix the signal-layer bubble
+        // key with "-sig" so it doesn't collide in bubbleRefs with the
+        // fallback layer's normal-bubble key. Both layers coexist in the
+        // DOM (one hidden by CSS); each needs its own ref slot so hover
+        // highlight targets the visible element.
+        const bubbleKey =
+          (payload.stock ?? payload.sector) + "-" + payload.x + "-sig";
         const hitR = Math.max(MIN_HIT_RADIUS, r * HIT_RADIUS_MULT);
 
         const onHitEnter = (e) => {
@@ -1375,10 +1381,21 @@ function TimelineBubble({
   }, [data, allowedSectors]);
 
   // =====================================================================
-  // 🔥 SMART ENTRY-AWARE bubbleShape
-  // For smart-entry bubbles, resolve the (tier × validation) style and
-  // pass to renderBubble. For everything else, fall through to the
-  // existing intent-based color system.
+  // ⚡ SIGNAL ENGINE PERF FIX: dual-render bubbleShape
+  //
+  // For bubbles that have a signal, we render BOTH layers every time:
+  //   • <g className="dr-signal-overlay">   ← the BUY/SELL/WARN visual
+  //   • <g className="dr-signal-fallback">  ← the normal-color bubble
+  // A single CSS class on a parent ancestor (dr-engine-on / dr-engine-off
+  // in page.js) hides one layer or the other.
+  //
+  // Why: toggling enableSignalEngine used to force React + Recharts to
+  // re-render every bubble (3-4s of paint at scale). With this layout,
+  // the toggle is one className flip — zero React work. The cost is a
+  // small DOM increase (only signal bubbles, only one extra <g>).
+  //
+  // enableSignalEngine is INTENTIONALLY NOT a dep here. The toggle is
+  // pure CSS now.
   // =====================================================================
   const bubbleShape = useCallback(
     (props) => {
@@ -1387,25 +1404,43 @@ function TimelineBubble({
 
       const style = layerStyles[d.layer] || layerStyles.mid;
 
-      // 🔥 PRIORITY 1: BUY/SELL/WARN signal — ONLY if engine enabled
-      if (enableSignalEngine && d.bubbleSignal) {
+      // Renders the bubble in its "normal" intent-based form (no signal).
+      // Reused both as the fallback layer and as the path for non-signal
+      // bubbles.
+      const renderNormal = () => {
+        if (d.isSmartEntry) {
+          const smartStyle = resolveSmartEntryStyle(d);
+          return renderBubble(
+            smartStyle.fill,
+            style.opacity,
+            smartStyle,
+          )(props);
+        }
+        const fill = resolveBubbleColor(d);
+        return renderBubble(fill, style.opacity, null)(props);
+      };
+
+      // PRIORITY 1: bubble has a BUY/SELL/WARN signal → dual-render so the
+      // engine toggle can flip between layers without a React re-render.
+      if (d.bubbleSignal) {
         const sigStyle = resolveSignalStyle(d);
         if (sigStyle) {
-          return renderBubbleWithSignal(sigStyle, style.opacity)(props);
+          return (
+            <g>
+              <g className="dr-signal-overlay">
+                {renderBubbleWithSignal(sigStyle, style.opacity)(props)}
+              </g>
+              <g className="dr-signal-fallback">{renderNormal()}</g>
+            </g>
+          );
         }
       }
 
-      // PRIORITY 2: existing smart entry (gold)
-      if (d.isSmartEntry) {
-        const smartStyle = resolveSmartEntryStyle(d);
-        return renderBubble(smartStyle.fill, style.opacity, smartStyle)(props);
-      }
-
-      // PRIORITY 3: default intent-based coloring
-      const fill = resolveBubbleColor(d);
-      return renderBubble(fill, style.opacity, null)(props);
+      // PRIORITY 2: no signal on this bubble → render the normal form once.
+      // (Single-layer; no need for the overlay/fallback wrappers.)
+      return renderNormal();
     },
-    [renderBubble, renderBubbleWithSignal, enableSignalEngine], // 🔥 added dep
+    [renderBubble, renderBubbleWithSignal],
   );
 
   const handleBandClick = useCallback((sector) => {
@@ -2093,6 +2128,10 @@ function TimelineBubble({
   );
 }
 // 🔥 PERF FIX B7: complete React.memo equality check including missing deps
+// ⚡ SIGNAL ENGINE PERF FIX: enableSignalEngine removed from comparison.
+// TimelineBubble no longer reads enableSignalEngine internally — the
+// engine toggle is a pure CSS class change on the parent div in page.js,
+// so this component doesn't need to re-render when the user toggles it.
 export default React.memo(TimelineBubble, (prev, next) => {
   return (
     prev.data === next.data &&
@@ -2109,7 +2148,6 @@ export default React.memo(TimelineBubble, (prev, next) => {
     prev.sectorPositions === next.sectorPositions &&
     prev.allowedSectors === next.allowedSectors &&
     prev.toggleFavorite === next.toggleFavorite &&
-    prev.setActiveCategory === next.setActiveCategory &&
-    prev.enableSignalEngine === next.enableSignalEngine
+    prev.setActiveCategory === next.setActiveCategory
   );
 });
